@@ -26,6 +26,11 @@ def create_app(config_name=None):
     app = Flask(__name__)
     cfg = config_by_name.get(config_name, config_by_name['development'])
     app.config.from_object(cfg)
+    if config_name == 'production':
+        secret_key = os.environ.get('SECRET_KEY')
+        if not secret_key or not secret_key.strip():
+            raise RuntimeError('SECRET_KEY must be set to a non-empty value in production.')
+        app.config['SECRET_KEY'] = secret_key
 
     # Initialize extensions
     db.init_app(app)

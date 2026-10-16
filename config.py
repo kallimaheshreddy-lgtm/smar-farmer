@@ -3,15 +3,22 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
+
+def normalize_database_url(db_url):
+    if db_url.startswith('postgres://'):
+        return db_url.replace('postgres://', 'postgresql+psycopg://', 1)
+    if db_url.startswith('postgresql://'):
+        return db_url.replace('postgresql://', 'postgresql+psycopg://', 1)
+    return db_url
+
+
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'smart-farmer-ai-prod-key-7788442299')
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'local-development-only-change-me')
     
-    # Handle Render / Heroku postgresql:// vs postgres:// URL format
-    db_url = os.environ.get('DATABASE_URL', f'sqlite:///{BASE_DIR / "faemer.db"}')
-    if db_url and db_url.startswith('postgres://'):
-        db_url = db_url.replace('postgres://', 'postgresql://', 1)
-        
-    SQLALCHEMY_DATABASE_URI = db_url
+    # Use psycopg 3 for PostgreSQL URLs on both Windows and production hosts.
+    SQLALCHEMY_DATABASE_URI = normalize_database_url(
+        os.environ.get('DATABASE_URL', f'sqlite:///{BASE_DIR / "faemer.db"}')
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', str(BASE_DIR / 'app' / 'static' / 'uploads'))
@@ -48,6 +55,7 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
+    SECRET_KEY = None
     SESSION_COOKIE_SECURE = True
 
 

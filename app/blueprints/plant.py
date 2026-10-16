@@ -30,11 +30,7 @@ def checker():
         symptoms_combined = ", ".join(symptoms_selected)
         if symptoms_notes:
             symptoms_combined += f" ({symptoms_notes})"
-            
-        if not crop_type:
-            flash('Please select or specify a crop type.', 'warning')
-            return render_template('plant/checker.html', user_crops=user_crops)
-            
+
         # File upload handling
         image_filename = None
         file = request.files.get('plant_image')
@@ -52,7 +48,16 @@ def checker():
             save_path = os.path.join(upload_dir, unique_name)
             file.save(save_path)
             image_filename = unique_name
-            
+
+        if not crop_type:
+            if image_filename:
+                crop_type = 'Field Crop (Auto-Diagnosed from Photo)'
+            elif symptoms_combined:
+                crop_type = 'Field Crop'
+            else:
+                flash('Please upload a photo of the affected plant or select your crop and symptoms.', 'warning')
+                return render_template('plant/checker.html', user_crops=user_crops)
+
         # AI Model Integration Check
         model_adapter = RemoteModelAdapter()
         assessment_result = None
@@ -136,3 +141,59 @@ def view_assessment(assessment_id):
         flash('Unauthorized access to private farmer record.', 'danger')
         return redirect(url_for('plant.history'))
     return render_template('plant/result.html', assessment=assessment, result=assessment)
+
+
+@plant_bp.route('/quick-solve', methods=['POST'])
+def quick_solve():
+    """
+    1-Click Instant Photo Diagnosis:
+    Farmer takes or uploads a photo directly, and immediately gets diagnosis, recommended medicine & dosage.
+    """
+    file = request.files.get('plant_image')
+    if not file or not file.filename:
+        flash('Please take a photo or select an image file to diagnose.', 'warning')
+        return redirect(url_for('plant.checker'))
+
+    is_valid, err_msg, sanitized_name = validate_image_file(file)
+    if not is_valid:
+        flash(err_msg, 'danger')
+        return redirect(url_for('plant.checker'))
+
+    ext = sanitized_name.rsplit('.', 1)[1].lower()
+    unique_name = f"plant_{uuid.uuid4().hex[:12]}.{ext}"
+    upload_dir = current_app.config.get('UPLOAD_FOLDER')
+    os.makedirs(upload_dir, exist_ok=True)
+    save_path = os.path.join(upload_dir, unique_name)
+    file.save(save_path)
+
+    # Perform automated image feature & agronomic assessment
+    assessment_result = perform_agronomic_assessment(
+        crop_type='Field Crop (Photo Diagnosis)',
+        symptoms_text='Photo Computer Vision Screening',
+        image_filename=unique_name
+    )
+
+    assessment = PlantAssessment(
+        user_id=current_user.id if current_user.is_authenticated else None,
+        crop_type='Field Crop (Photo Diagnosis)',
+        growth_stage='Visual Screening',
+        image_filename=unique_name,
+        symptoms_selected='Photo Visual Analysis',
+        symptoms_notes='1-Click Instant Photo Assessment',
+        detected_issue=assessment_result['detected_issue'],
+        confidence=assessment_result['confidence'],
+        assessment_mode=assessment_result['assessment_mode'],
+        reasons_supporting=assessment_result['reasons_supporting'],
+        alternative_causes=assessment_result['alternative_causes'],
+        recommended_steps=assessment_result['recommended_steps'],
+        safety_precautions=assessment_result['safety_precautions'],
+        source_institution=assessment_result['source_institution'],
+        review_date=assessment_result['review_date'],
+        requires_expert_visit=assessment_result['requires_expert_visit']
+    )
+    db.session.add(assessment)
+    db.session.commit()
+
+    flash('Photo analyzed successfully! Here is the diagnosis, medicine to spray, and safe dosage.', 'success')
+    return render_template('plant/result.html', assessment=assessment, result=assessment_result)
+

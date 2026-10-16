@@ -14,6 +14,8 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def index():
     """Home landing page for Smart Farmer AI."""
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
     weather = None
     default_district = 'Warangal, Telangana'
     if current_user.is_authenticated and current_user.district:

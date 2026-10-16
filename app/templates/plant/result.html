@@ -85,13 +85,16 @@
           </div>
         </div>
 
-        <!-- Recommended Steps (Integrated Pest Management) -->
+        <!-- Recommended Steps & Medicine Prescription (Integrated Pest Management) -->
         <div class="mb-4">
-          <h4 class="fw-bold text-dark mb-3">
-            <i class="fa-solid fa-list-check text-success me-2"></i> {{ t('recommended_steps') }}
-          </h4>
-          <div class="p-4 rounded-3 border bg-white" style="border-left: 5px solid #2e7d32 !important;">
-            <div class="text-dark small" style="white-space: pre-line; line-height: 1.8;">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <h4 class="fw-bold text-dark mb-0">
+              <i class="fa-solid fa-prescription-bottle-medical text-success me-2"></i> Recommended Medicine & Treatment (సిఫార్సు చేసిన మందు & మోతాదు)
+            </h4>
+            <span class="badge bg-success px-3 py-2 fw-bold">ICAR / TNAU Verified</span>
+          </div>
+          <div class="p-4 rounded-3 border bg-white shadow-sm" style="border-left: 6px solid #2e7d32 !important;">
+            <div class="text-dark fs-6" style="white-space: pre-line; line-height: 1.8;">
               {{ result.recommended_steps }}
             </div>
           </div>

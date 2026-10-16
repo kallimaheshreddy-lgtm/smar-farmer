@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Bad Request — Smart Farmer AI{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+  <div class="col-md-7 text-center">
+    <div class="card border-0 shadow-sm bg-white p-5" style="border-radius: var(--radius-lg);">
+      <div class="display-1 fw-bold text-warning mb-2">400</div>
+      <h3 class="fw-bold text-dark mb-2">Request Expired or Invalid</h3>
+      <p class="text-muted small mb-4">Your session or form security token has expired. Please refresh the page and try submitting your mobile number or photo again.</p>
+      <div>
+        <a href="{{ url_for('main.index') }}" class="btn btn-farmer-primary me-2">Back to Field Home</a>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary">Log In with Mobile</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

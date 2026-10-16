@@ -195,20 +195,26 @@ To connect an automated classification model (e.g. PyTorch/TensorFlow/FastAPI se
    - Click **New** > **Blueprint**.
    - Connect your GitHub repository.
    - Render will read `render.yaml` and provision:
-     * A web service running `gunicorn run:app`
+     * A web service running `python -m gunicorn run:app`
      * A managed PostgreSQL database (`smartfarmer-db`)
      * Automatic database seeding via `seed_data.py`.
 
 3. **Deploy Manually (Alternative)**:
    - Create a **Web Service** on Render.
    - **Environment**: Python
-   - **Build Command**: `pip install -r requirements.txt && python seed_data.py`
-   - **Start Command**: `gunicorn run:app`
+   - **Build Command**: `python -m pip install -r requirements.txt && python seed_data.py`
+   - **Start Command**: `python -m gunicorn run:app`
    - **Environment Variables**:
      * `FLASK_ENV`: `production`
      * `SECRET_KEY`: (Click Generate)
      * `DATABASE_URL`: (Paste PostgreSQL connection string)
    - **Health Check Path**: `/healthz`
+
+Production startup requires a non-empty `SECRET_KEY`; the application will stop
+with a clear error if it is missing. Generate a value with
+`python -c "import secrets; print(secrets.token_hex(32))"` and set it as a
+Render environment variable. PostgreSQL connection URLs use the `psycopg` 3
+binary driver, which supports Windows development systems as well.
 
 ---
 

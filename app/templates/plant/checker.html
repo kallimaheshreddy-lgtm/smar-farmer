@@ -1,197 +1,202 @@
 {% extends "base.html" %}
 
-{% block title %}{{ t('plant_title') }}{% endblock %}
+{% block title %}Plant Health Doctor — Smart Farmer AI{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-lg-9">
-    <div class="card border-0 shadow-sm bg-white" style="border-radius: var(--radius-lg);">
-      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+<div class="row justify-content-center py-3">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow bg-white overflow-hidden" style="border-radius: var(--radius-lg);">
+      <!-- Header Banner -->
+      <div class="card-header border-0 text-white p-4" style="background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);">
         <div class="d-flex align-items-center gap-3">
-          <div class="card-icon-box card-icon-green mb-0">
-            <i class="fa-solid fa-plant-wilt"></i>
+          <div class="rounded-circle bg-white text-success d-flex align-items-center justify-content-center shadow-sm" style="width: 58px; height: 58px; font-size: 1.8rem;">
+            <i class="fa-solid fa-camera"></i>
           </div>
           <div>
-            <h3 class="fw-bold mb-1 text-dark">{{ t('plant_title') }}</h3>
-            <p class="text-muted small mb-0">{{ t('plant_subtitle') }}</p>
+            <span class="badge bg-warning text-dark fw-bold px-3 py-1 mb-1">100% Photo-Based Solution</span>
+            <h3 class="fw-bold mb-0 text-white">🌿 Plant Health Doctor (పంటల డాక్టర్)</h3>
+            <p class="text-white-50 small mb-0">No technical details or checkboxes needed! Just take a photo of the leaf or crop.</p>
           </div>
         </div>
       </div>
 
-      <div class="card-body p-4">
-        <form method="POST" action="{{ url_for('plant.checker') }}" enctype="multipart/form-data">
+      <div class="card-body p-4 p-md-5">
+        {% if not current_user.is_authenticated %}
+        <div class="alert alert-light border shadow-sm d-flex justify-content-between align-items-center py-2 px-3 mb-4 rounded-3">
+          <span class="small text-muted"><i class="fa-solid fa-mobile-screen-button text-success me-1"></i> Want to save your crop assessments?</span>
+          <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-success fw-bold"><i class="fa-solid fa-arrow-right-to-bracket me-1"></i> 📱 Mobile Login</a>
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('plant.quick_solve') }}" enctype="multipart/form-data" id="plantPhotoForm">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
-          <!-- Step 1: Crop Selection & Growth Stage -->
-          <div class="mb-4">
-            <h5 class="fw-bold text-success border-bottom pb-2">
-              <span class="badge bg-success me-2">1</span> {{ t('crop_type') }} & Stage
-            </h5>
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label fw-semibold">{{ t('crop_type') }} <span class="text-danger">*</span></label>
-                <select name="crop_type" class="form-select" required>
-                  <option value="">{{ t('select_crop') }}</option>
-                  <option value="Rice">Rice / Paddy (వరి / धान)</option>
-                  <option value="Cotton">Cotton (ప్రత్తి / कपास)</option>
-                  <option value="Tomato">Tomato (టమోటా / टमाटर)</option>
-                  <option value="Chilli">Chilli (మిరప / मिर्च)</option>
-                  <option value="Wheat">Wheat (గోధుమ / गेहूं)</option>
-                  <option value="Maize">Maize / Corn (మొక్కజొన్న / मक्का)</option>
-                  <option value="Potato">Potato (బంగాళాదుంప / आलू)</option>
-                  <option value="Groundnut">Groundnut (వేరుశనగ / मूंगफली)</option>
-                  <option value="Sugarcane">Sugarcane (చెరకు / गन्ना)</option>
-                  <option value="Onion">Onion (ఉల్లిపాయ / प्याज)</option>
-                  <option value="Mango">Mango (మామిడి / आम)</option>
-                  <option value="Mustard">Mustard (ఆవాలు / सरसों)</option>
-                  <option value="Soybean">Soybean (సోయాబీన్ / सोयाबीन)</option>
-                  <option value="Other">Other Horticultural / Field Crop</option>
-                </select>
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label fw-semibold">{{ t('growth_stage') }}</label>
-                <select name="growth_stage" class="form-select">
-                  <option value="Vegetative">Vegetative / Tillering Stage</option>
-                  <option value="Seedling / Nursery">Seedling / Nursery</option>
-                  <option value="Flowering / Squaring">Flowering / Squaring Stage</option>
-                  <option value="Fruiting / Grain Filling">Fruiting / Grain Filling</option>
-                  <option value="Maturity / Harvest">Maturity / Near Harvest</option>
-                </select>
-              </div>
-
-              {% if user_crops %}
-              <div class="col-12">
-                <label class="form-label fw-semibold text-muted small">Link to My Farm Plot (Optional):</label>
-                <select name="crop_id" class="form-select form-select-sm">
-                  <option value="">-- Do not link to a saved field --</option>
-                  {% for uc in user_crops %}
-                  <option value="{{ uc.id }}">{{ uc.name }} ({{ uc.field_name }}, {{ uc.area_acres }} Acres)</option>
-                  {% endfor %}
-                </select>
-              </div>
-              {% endif %}
-            </div>
-          </div>
-
-          <!-- Step 2: Affected Plant Parts & Visible Symptoms Checklist -->
-          <div class="mb-4">
-            <h5 class="fw-bold text-success border-bottom pb-2">
-              <span class="badge bg-success me-2">2</span> {{ t('observed_symptoms') }}
-            </h5>
-
+          <!-- Giant Touch-Friendly Camera Box -->
+          <div class="p-4 p-md-5 mb-4 rounded-4 text-center cursor-pointer shadow-sm" 
+               id="cameraTriggerBox"
+               onclick="document.getElementById('plantImageInput').click();"
+               style="cursor: pointer; background: #f1f8e9; border: 3px dashed #2e7d32; transition: all 0.3s ease;">
+            
             <div class="mb-3">
-              <label class="form-label fw-semibold">{{ t('affected_parts') }}:</label>
-              <div class="d-flex flex-wrap gap-3">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="affected_parts" value="Leaves" id="partLeaf" checked>
-                  <label class="form-check-label" for="partLeaf">Leaves / Foliage</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="affected_parts" value="Stem / Branches" id="partStem">
-                  <label class="form-check-label" for="partStem">Stem / Branches</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="affected_parts" value="Fruits / Bolls / Pods" id="partFruit">
-                  <label class="form-check-label" for="partFruit">Fruits / Bolls / Pods</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="affected_parts" value="Roots / Collar" id="partRoot">
-                  <label class="form-check-label" for="partRoot">Roots / Collar Region</label>
-                </div>
-              </div>
+              <span class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center shadow" style="width: 80px; height: 80px;">
+                <i class="fa-solid fa-camera-retro fs-1"></i>
+              </span>
             </div>
 
-            <label class="form-label fw-semibold">Check All Symptoms You Notice:</label>
-            <div class="row g-2 mb-3">
-              <div class="col-md-6">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="symptoms" value="spindle boat shaped leaf spots" id="sym1">
-                  <label class="form-check-label" for="sym1">Spindle / Boat-shaped spots with grey center</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="symptoms" value="yellowing wavy margin lesions" id="sym2">
-                  <label class="form-check-label" for="sym2">Yellowing leaf tips with wavy, undulating margins</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="symptoms" value="concentric target board brown rings" id="sym3">
-                  <label class="form-check-label" for="sym3">Concentric brown rings (target-board spots)</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="symptoms" value="upward leaf curling crinkling stunted" id="sym4">
-                  <label class="form-check-label" for="sym4">Upward leaf curling, puckering, or stunting</label>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="symptoms" value="yellow powder pustules rust dust" id="sym5">
-                  <label class="form-check-label" for="sym5">Yellow / rust-colored powder along leaf veins</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="symptoms" value="dieback drying from tip circular dark fruit spot" id="sym6">
-                  <label class="form-check-label" for="sym6">Branch tip die-back or sunken fruit spots</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="symptoms" value="angular water soaked vein spots" id="sym7">
-                  <label class="form-check-label" for="sym7">Angular water-soaked spots bounded by veins</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="symptoms" value="wilting yellowing lower leaves" id="sym8">
-                  <label class="form-check-label" for="sym8">Sudden wilting or drooping despite moist soil</label>
-                </div>
-              </div>
-            </div>
+            <h3 class="fw-bold text-dark mb-2">📸 Open Camera & Take Plant Photo</h3>
+            <p class="text-success fw-semibold fs-5 mb-1">మీ ఫోన్ కెమెరాతో పంట ఆకు ఫోటో తీయండి</p>
+            <p class="text-muted small mb-0">Tap here to open your mobile phone camera or select photo from gallery</p>
 
-            <div class="row g-3">
-              <div class="col-md-4">
-                <label class="form-label fw-semibold">{{ t('symptom_duration') }}</label>
-                <input type="number" name="symptom_duration" class="form-control" placeholder="e.g. 3" min="1" max="180">
-              </div>
-              <div class="col-md-8">
-                <label class="form-label fw-semibold">Other Specific Observations (Color, insects, patterns):</label>
-                <input type="text" name="symptoms_notes" class="form-control" placeholder="e.g. Small whiteflies visible under leaves, spots appeared after rain">
-              </div>
-            </div>
+            <input type="file" id="plantImageInput" name="plant_image" class="d-none" accept="image/*" capture="environment" required onchange="handlePlantPhotoPreview(this);">
           </div>
 
-          <!-- Step 3: Photo Upload with Live Preview -->
-          <div class="mb-4">
-            <h5 class="fw-bold text-success border-bottom pb-2">
-              <span class="badge bg-success me-2">3</span> {{ t('upload_image') }}
-            </h5>
-            <div class="upload-dropzone mb-3" onclick="document.getElementById('plantImageInput').click();">
-              <i class="fa-solid fa-cloud-arrow-up fs-1 text-success mb-2"></i>
-              <h6 class="fw-bold text-dark mb-1">Click to Select or Take Photo of Affected Plant</h6>
-              <p class="text-muted small mb-0">Supported formats: JPG, PNG, WEBP (Maximum 8MB). Capture clear closeup in daylight.</p>
-              <input type="file" id="plantImageInput" name="plant_image" class="d-none" accept="image/*">
+          <!-- Live Photo Preview -->
+          <div id="previewContainer" class="text-center mb-4 d-none">
+            <div class="position-relative d-inline-block">
+              <img id="imagePreview" src="" alt="Captured Plant Photo" class="img-fluid rounded-4 shadow" style="max-height: 280px; object-fit: cover; border: 4px solid #2e7d32;">
+              <span class="badge bg-success position-absolute top-0 end-0 m-2 px-3 py-2 fs-6 shadow">
+                <i class="fa-solid fa-circle-check me-1"></i> Photo Ready!
+              </span>
             </div>
-
-            <div id="previewContainer" class="preview-container text-center mb-3" style="display: none;">
-              <p class="small text-muted mb-1 fw-bold">Selected Image Preview:</p>
-              <img id="imagePreview" src="" alt="Selected Plant Image Preview" class="img-fluid">
-            </div>
+            <div class="small text-muted mt-2 fw-semibold" id="photoFileName"></div>
           </div>
 
-          <!-- Important Agronomic Disclaimer -->
-          <div class="disclaimer-box mb-4">
-            <div class="d-flex align-items-start gap-2">
-              <i class="fa-solid fa-circle-exclamation text-warning fs-5 mt-1"></i>
-              <div>
-                <strong>Preliminary Screening Notice:</strong>
-                {{ t('plant_disclaimer') }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Submit Button -->
-          <div class="d-grid">
-            <button type="submit" class="btn btn-farmer-primary btn-touch-lg fw-bold">
-              <i class="fa-solid fa-microscope me-2"></i> {{ t('assess_button') }}
+          <!-- Submit Buttons -->
+          <div class="d-grid gap-3">
+            <button type="submit" id="solvePlantBtn" class="btn btn-warning btn-touch-lg fw-bold fs-4 py-3 shadow">
+              <i class="fa-solid fa-wand-magic-sparkles me-2"></i> Solve Crop Disease & Get Medicine
             </button>
+            <button type="button" class="btn btn-outline-success fw-bold py-2 rounded-pill" onclick="openLiveCameraModal('plant');">
+              <i class="fa-solid fa-video me-1"></i> Or Use On-Screen Live Viewfinder Camera
+            </button>
+          </div>
+
+          <!-- Friendly 3-Step Guide -->
+          <div class="row g-3 text-center mt-4 pt-3 border-top">
+            <div class="col-4">
+              <div class="fw-bold text-success fs-5">1. 📸 Snap</div>
+              <div class="text-muted small">Take photo of affected plant</div>
+            </div>
+            <div class="col-4">
+              <div class="fw-bold text-primary fs-5">2. 🧠 AI Analyzes</div>
+              <div class="text-muted small">Identifies crop & disease</div>
+            </div>
+            <div class="col-4">
+              <div class="fw-bold text-warning text-dark fs-5">3. 💊 Medicine</div>
+              <div class="text-muted small">Exact medicine & water dosage</div>
+            </div>
           </div>
         </form>
       </div>
     </div>
   </div>
 </div>
+
+<!-- LIVE CAMERA VIEWFINDER MODAL -->
+<div class="modal fade" id="liveCameraModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden bg-black text-white">
+      <div class="modal-header border-0 bg-dark text-white">
+        <h5 class="modal-title fw-bold">
+          <i class="fa-solid fa-video text-warning me-2"></i> Live Field Camera
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="stopLiveCamera();"></button>
+      </div>
+      <div class="modal-body p-3 text-center">
+        <div class="position-relative d-inline-block w-100">
+          <video id="cameraVideo" autoplay playsinline class="w-100 rounded-3 shadow" style="max-height: 380px; object-fit: cover; background: #111;"></video>
+          <canvas id="cameraCanvas" class="d-none"></canvas>
+          <div class="position-absolute top-50 start-50 translate-middle border border-2 border-warning rounded-3" style="width: 70%; height: 70%; pointer-events: none; border-style: dashed !important; opacity: 0.7;"></div>
+          <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2 text-white small px-3 py-1 rounded-pill bg-dark bg-opacity-75">
+            Aim at affected leaf or plant part
+          </div>
+        </div>
+        <div class="mt-3 d-flex justify-content-center gap-3">
+          <button type="button" class="btn btn-warning btn-lg fw-bold px-4 rounded-pill shadow" onclick="captureLivePhoto();">
+            📸 SNAP PHOTO NOW
+          </button>
+          <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal" onclick="stopLiveCamera();">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let liveStream = null;
+
+function handlePlantPhotoPreview(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('imagePreview').src = e.target.result;
+      document.getElementById('previewContainer').classList.remove('d-none');
+      document.getElementById('photoFileName').innerText = input.files[0].name;
+      
+      const btn = document.getElementById('solvePlantBtn');
+      btn.innerHTML = '<i class="fa-solid fa-bolt me-2 text-dark"></i> <strong>⚡ PHOTO READY: TAP TO GET MEDICINE NOW!</strong>';
+      btn.classList.remove('btn-warning');
+      btn.classList.add('btn-success', 'border', 'border-3', 'border-warning');
+      btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function openLiveCameraModal() {
+  const modalEl = document.getElementById('liveCameraModal');
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
+
+  const video = document.getElementById('cameraVideo');
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: "environment" } },
+      audio: false
+    }).then(function(stream) {
+      liveStream = stream;
+      video.srcObject = stream;
+      video.play();
+    }).catch(function(err) {
+      console.warn("Camera fallback to native picker:", err);
+      modal.hide();
+      document.getElementById('plantImageInput').click();
+    });
+  } else {
+    modal.hide();
+    document.getElementById('plantImageInput').click();
+  }
+}
+
+function stopLiveCamera() {
+  if (liveStream) {
+    liveStream.getTracks().forEach(track => track.stop());
+    liveStream = null;
+  }
+}
+
+function captureLivePhoto() {
+  const video = document.getElementById('cameraVideo');
+  const canvas = document.getElementById('cameraCanvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  stopLiveCamera();
+  const modalEl = document.getElementById('liveCameraModal');
+  const modal = bootstrap.Modal.getInstance(modalEl);
+  if (modal) modal.hide();
+
+  canvas.toBlob(function(blob) {
+    const file = new File([blob], "field_plant_" + Date.now() + ".jpg", { type: "image/jpeg" });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    const input = document.getElementById('plantImageInput');
+    input.files = dataTransfer.files;
+    handlePlantPhotoPreview(input);
+    document.getElementById('plantPhotoForm').submit();
+  }, 'image/jpeg', 0.9);
+}
+</script>
 {% endblock %}

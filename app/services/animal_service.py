@@ -5,6 +5,8 @@ Cows, Buffaloes, Goats, Sheep, Poultry, and other domestic animals.
 Strictly adheres to veterinary ethics: No drug prescriptions or clinical diagnosis.
 Prioritizes emergency red flags and safe interim nursing care.
 """
+import os
+from PIL import Image
 
 # Red-flag clinical emergency signs that mandate immediate veterinary care
 EMERGENCY_DANGER_SIGNS = [
@@ -33,8 +35,51 @@ URGENT_WARNING_SIGNS = [
 ]
 
 
+def analyze_animal_image_features(image_path):
+    """
+    Performs visual inspection of animal symptom image using Pillow:
+    Detects severe redness/inflammation (erythema), purulent discharge (pale yellow/white),
+    and necrotic/ulcerative tissue (dark tissue).
+    """
+    if not image_path or not os.path.exists(image_path):
+        return None
+
+    try:
+        with Image.open(image_path) as img:
+            rgb_img = img.convert('RGB')
+            sample = rgb_img.resize((150, 150))
+            pixels = list(sample.getdata())
+            total = len(pixels)
+            if total == 0:
+                return None
+
+            red_inflamed_count = 0
+            dark_ulcer_count = 0
+            pale_discharge_count = 0
+
+            for r, g, b in pixels:
+                # Acute inflammation / open wound: High Red, low Green & Blue
+                if r > 135 and g < 95 and b < 85:
+                    red_inflamed_count += 1
+                # Dark necrotic / gangrenous tissue
+                elif r < 45 and g < 45 and b < 45:
+                    dark_ulcer_count += 1
+                # Purulent discharge / cloudy opacity
+                elif r > 175 and g > 170 and b > 135 and abs(r - g) < 25:
+                    pale_discharge_count += 1
+
+            return {
+                'inflammation_pct': round(red_inflamed_count / total, 3),
+                'ulcer_pct': round(dark_ulcer_count / total, 3),
+                'discharge_pct': round(pale_discharge_count / total, 3),
+                'total_pixels': total
+            }
+    except Exception:
+        return None
+
+
 def evaluate_animal_triage(
-    species,
+    species='Cow',
     age_approx=None,
     symptoms_selected=None,
     symptoms_notes=None,
@@ -43,7 +88,8 @@ def evaluate_animal_triage(
     temperature_status='normal',
     breathing_status='normal',
     standing_status='normal',
-    milk_yield_drop='none'
+    milk_yield_drop='none',
+    image_filename=None
 ):
     """
     Performs conservative veterinary triage assessment.
@@ -93,6 +139,28 @@ def evaluate_animal_triage(
         
     # 2. Check for Urgent Veterinary Signs (12-24 hours)
     urgent_reasons = []
+    
+    # Check visual image features if animal photo is provided
+    visual_features = None
+    if image_filename:
+        img_path = image_filename
+        if not os.path.isabs(img_path):
+            try:
+                from flask import current_app
+                upload_folder = current_app.config.get('UPLOAD_FOLDER', 'uploads')
+                img_path = os.path.join(upload_folder, image_filename)
+            except Exception:
+                img_path = image_filename
+        if os.path.exists(img_path):
+            visual_features = analyze_animal_image_features(img_path)
+
+    if visual_features:
+        if visual_features['inflammation_pct'] >= 0.04:
+            urgent_reasons.append(f"Visual photo analysis detected active cutaneous inflammation/erythema ({int(visual_features['inflammation_pct']*100)}% red lesion index).")
+        if visual_features['ulcer_pct'] >= 0.05:
+            urgent_reasons.append(f"Visual photo analysis detected localized ulcerative or necrotic tissue ({int(visual_features['ulcer_pct']*100)}% ulcer index).")
+        if visual_features['discharge_pct'] >= 0.08:
+            urgent_reasons.append(f"Visual photo analysis detected purulent exudate / discharge ({int(visual_features['discharge_pct']*100)}% discharge index).")
     
     if appetite in ['stopped', 'off_feed']:
         urgent_reasons.append("Animal has completely stopped taking feed or water.")

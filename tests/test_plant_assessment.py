@@ -57,3 +57,22 @@ def test_plant_assessment_tomato_early_blight(client):
     assert b'Early Blight' in res.data
     assert b'Alternaria' in res.data
     assert b'Trichoderma' in res.data
+
+
+def test_plant_assessment_only_photo(client):
+    img_io = create_dummy_image()
+    res = client.post('/plant/checker', data={
+        'plant_image': (img_io, 'field_sample.jpg')
+    }, content_type='multipart/form-data')
+    assert res.status_code == 200
+    assert b'Recommended Medicine' in res.data or b'ICAR' in res.data
+
+
+def test_quick_solve_endpoint(client):
+    img_io = create_dummy_image()
+    res = client.post('/plant/quick-solve', data={
+        'plant_image': (img_io, 'leaf_photo.jpg')
+    }, content_type='multipart/form-data', follow_redirects=True)
+    assert res.status_code == 200
+    assert b'Photo analyzed successfully' in res.data or b'Recommended Medicine' in res.data
+

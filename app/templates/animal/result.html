@@ -39,6 +39,13 @@
               </p>
             </div>
 
+            {% if record.image_filename %}
+            <div class="col-md-3 text-center my-2">
+              <img src="{{ url_for('static', filename='uploads/' + record.image_filename) }}" alt="Animal Symptom Photo" class="img-thumbnail rounded-3 shadow-sm" style="max-height: 140px; object-fit: cover; border: 2px solid #b71c1c;">
+              <div class="small text-muted mt-1">Field Photo of Animal</div>
+            </div>
+            {% endif %}
+
             <div>
               {% if record.requires_immediate_vet or record.urgency_level == 'emergency' %}
               <a href="tel:1962" class="btn btn-danger btn-touch-lg fw-bold shadow animate-pulse">

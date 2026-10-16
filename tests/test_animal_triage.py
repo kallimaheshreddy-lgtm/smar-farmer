@@ -63,3 +63,16 @@ def test_triage_endpoint_via_client(client):
     assert b'CRITICAL EMERGENCY' in res.data
     assert b'1962' in res.data
     assert b'DO NOT' in res.data
+
+
+def test_animal_quick_solve_with_photo(client):
+    from tests.conftest import create_dummy_image
+    img_io = create_dummy_image()
+    res = client.post('/animal/quick-solve', data={
+        'species': 'Cow',
+        'animal_image': (img_io, 'cow_skin.jpg')
+    }, content_type='multipart/form-data', follow_redirects=True)
+    assert res.status_code == 200
+    assert b'1962' in res.data
+    assert b'DO NOT' in res.data
+
