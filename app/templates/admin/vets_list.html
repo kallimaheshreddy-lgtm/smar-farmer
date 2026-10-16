@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Veterinary Directory — Admin{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm bg-white" style="border-radius: var(--radius-lg);">
+  <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+    <div>
+      <h3 class="fw-bold text-dark mb-1"><i class="fa-solid fa-hospital-user text-danger me-2"></i> Veterinary & KVK Directory Management</h3>
+      <p class="text-muted small mb-0">Update contact numbers, clinics, and emergency polyclinics across districts.</p>
+    </div>
+    <a href="{{ url_for('admin.vets_add') }}" class="btn btn-farmer-danger">
+      <i class="fa-solid fa-plus me-1"></i> Add Contact
+    </a>
+  </div>
+
+  <div class="card-body p-4">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Type</th>
+            <th>Name</th>
+            <th>State & District</th>
+            <th>Phone</th>
+            <th>Emergency Phone</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in contacts %}
+          <tr class="{% if not c.is_active %}opacity-50{% endif %}">
+            <td><span class="badge bg-danger-subtle text-danger">{{ c.contact_type }}</span></td>
+            <td class="fw-bold text-dark">{{ c.name }}</td>
+            <td class="small">{{ c.district }}, {{ c.state }}</td>
+            <td class="small">{{ c.phone }}</td>
+            <td class="small">{{ c.emergency_phone or '—' }}</td>
+            <td>
+              {% if c.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-secondary">Inactive</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{{ url_for('admin.vets_edit', contact_id=c.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

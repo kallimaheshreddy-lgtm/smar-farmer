@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action }} Knowledge Article — Admin{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="card border-0 shadow-sm bg-white" style="border-radius: var(--radius-lg);">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <h3 class="fw-bold text-dark"><i class="fa-solid fa-file-pen text-success me-2"></i> {{ action }} Knowledge Article</h3>
+        <p class="text-muted small">Curation standard: Only enter verified treatments and guidelines backed by official extension literature.</p>
+      </div>
+      <div class="card-body p-4">
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+              <select name="category" class="form-select" required>
+                <option value="crop_disease" {% if article and article.category == 'crop_disease' %}selected{% endif %}>Plant Disease Management</option>
+                <option value="pest" {% if article and article.category == 'pest' %}selected{% endif %}>Pest Control (IPM)</option>
+                <option value="fertilizer" {% if article and article.category == 'fertilizer' %}selected{% endif %}>Fertilizer & Soil Nutrition</option>
+                <option value="animal_health" {% if article and article.category == 'animal_health' %}selected{% endif %}>Animal Health Condition</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Target Crop or Animal <span class="text-danger">*</span></label>
+              <input type="text" name="crop_or_animal" class="form-control" placeholder="e.g. Rice, Cotton, Tomato, Cow, Goat" value="{{ article.crop_or_animal if article else '' }}" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Article Title <span class="text-danger">*</span></label>
+            <input type="text" name="title" class="form-control" placeholder="e.g. Rice Blast Management (Pyricularia oryzae)" value="{{ article.title if article else '' }}" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Symptoms & Field Identification</label>
+            <textarea name="symptoms_description" class="form-control" rows="2" placeholder="Visual identification keys, spore patterns, lesions...">{{ article.symptoms_description if article else '' }}</textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Verified Management Practices (IPM / First-Aid) <span class="text-danger">*</span></label>
+            <textarea name="management_practices" class="form-control" rows="4" placeholder="Step-by-step cultural, biological, and agronomic management..." required>{{ article.management_practices if article else '' }}</textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Organic & Biocontrol Alternatives</label>
+            <textarea name="organic_options" class="form-control" rows="2" placeholder="Bio-fungicides, neem formulations, predator releases...">{{ article.organic_options if article else '' }}</textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Safety & Environmental Precautions</label>
+            <textarea name="safety_precautions" class="form-control" rows="2" placeholder="PPE requirements, spray timing, water safety...">{{ article.safety_precautions if article else '' }}</textarea>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Verified Source Institution <span class="text-danger">*</span></label>
+              <input type="text" name="source_institution" class="form-control" placeholder="e.g. ICAR-IIRR Hyderabad, TNAU, IVRI" value="{{ article.source_institution if article else '' }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Last Reviewed Date <span class="text-danger">*</span></label>
+              <input type="text" name="last_reviewed_date" class="form-control" placeholder="e.g. August 2026" value="{{ article.last_reviewed_date if article else 'August 2026' }}" required>
+            </div>
+          </div>
+
+          {% if action == 'Edit' %}
+          <div class="form-check mb-4">
+            <input class="form-check-input" type="checkbox" name="is_active" id="isActive" {% if article.is_active %}checked{% endif %}>
+            <label class="form-check-label fw-semibold" for="isActive">Active (Display publicly to farmers)</label>
+          </div>
+          {% endif %}
+
+          <div class="d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('admin.knowledge_list') }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-farmer-primary fw-bold px-4">{{ action }} Article</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

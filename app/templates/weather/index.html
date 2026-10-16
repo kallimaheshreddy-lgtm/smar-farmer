@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('weather') }} — Smart Farmer AI{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-10">
+    <div class="card border-0 shadow-sm bg-white mb-4" style="border-radius: var(--radius-lg);">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+          <div>
+            <h2 class="fw-bold text-dark mb-1"><i class="fa-solid fa-cloud-sun text-info me-2"></i> Agro-Climatic Weather Desk</h2>
+            <p class="text-muted small mb-0">Practical weather guidance, foliar spray safety windows, and irrigation advisories.</p>
+          </div>
+          <div>
+            <button id="btnGetLocation" class="btn btn-outline-primary btn-sm fw-bold">
+              📍 Use My Exact Location
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body p-4 p-md-5">
+        <!-- Manual District Selector -->
+        <div class="p-3 rounded-3 bg-light border mb-4">
+          <form method="GET" action="{{ url_for('weather.index') }}" class="row g-2 align-items-center">
+            <div class="col-md-3">
+              <label class="form-label mb-0 fw-bold small text-dark"><i class="fa-solid fa-location-dot text-danger me-1"></i> Select Agricultural District:</label>
+            </div>
+            <div class="col-md-7">
+              <select name="district" class="form-select form-select-sm">
+                {% for d in districts %}
+                <option value="{{ d }}" {% if selected_district == d %}selected{% endif %}>{{ d }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-farmer-primary btn-sm w-100 fw-bold">Update Weather</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Weather Status Card -->
+        <div class="p-4 rounded-3 border mb-4 bg-white shadow-sm" style="border-top: 5px solid #0288d1 !important;">
+          <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+              <span class="badge bg-info-subtle text-info fw-semibold">{{ weather.zone }}</span>
+              <h3 class="fw-bold text-dark mt-2 mb-1">{{ weather.location_name }}</h3>
+              <p class="text-muted small mb-0">Source: <strong>{{ weather.source if weather.configured else 'Regional Agro-Climatic Baseline' }}</strong></p>
+            </div>
+            {% if weather.configured %}
+            <div class="text-md-end mt-3 mt-md-0">
+              <div class="display-5 fw-bold text-dark">{{ weather.temperature }}°C</div>
+              <div class="text-muted fw-semibold">{{ weather.description }}</div>
+            </div>
+            {% endif %}
+          </div>
+
+          {% if weather.configured %}
+          <hr class="my-3">
+          <div class="row g-3 text-center">
+            <div class="col-4">
+              <div class="p-2 rounded bg-light">
+                <span class="text-muted small d-block">Relative Humidity</span>
+                <strong class="fs-5 text-dark">{{ weather.humidity }}%</strong>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-2 rounded bg-light">
+                <span class="text-muted small d-block">Wind Velocity</span>
+                <strong class="fs-5 text-dark">{{ weather.wind_speed }} m/s</strong>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-2 rounded bg-light">
+                <span class="text-muted small d-block">Spray Window</span>
+                <strong class="fs-5 {% if weather.wind_speed > 4.5 %}text-danger{% else %}text-success{% endif %}">
+                  {{ 'Unfavorable' if weather.wind_speed > 4.5 else 'Favorable' }}
+                </strong>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <!-- Transparent Setup Notice when API key is missing (NO fabricated numbers) -->
+          <div class="alert alert-info mt-3 mb-0 small">
+            <div class="d-flex align-items-start gap-2">
+              <i class="fa-solid fa-circle-info fs-5 mt-1"></i>
+              <div>
+                <strong>Live Weather Service Notice:</strong>
+                <p class="mb-2">{{ weather.notice }}</p>
+                <div class="p-2 bg-white rounded border font-monospace text-dark" style="white-space: pre-line; font-size: 0.8rem;">
+                  {{ weather.setup_guide }}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Actionable Farming & Livestock Advisories -->
+        <h4 class="fw-bold text-dark mb-3"><i class="fa-solid fa-wheat-awn text-success me-2"></i> Actionable Farm Advisories for this Region</h4>
+        <div class="vstack gap-3 mb-4">
+          {% for adv in weather.advisories %}
+          <div class="p-3 rounded-3 border bg-{{ adv.alert_type }}-subtle text-{{ adv.alert_type }} d-flex align-items-start gap-3">
+            <i class="fa-solid fa-circle-check fs-4 mt-1"></i>
+            <div>
+              <h6 class="fw-bold mb-1">{{ adv.category }}</h6>
+              <p class="small mb-0 text-dark" style="line-height: 1.6;">{{ adv.message }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="disclaimer-box">
+          <i class="fa-solid fa-shield-halved text-success me-1"></i>
+          <strong>Meteorological Notice:</strong> Weather-based advisory recommendations follow Indian Meteorological Department (IMD) Agromet Advisory standards. Always verify local sky conditions before commencing large-scale harvesting or chemical spraying.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

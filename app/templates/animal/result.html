@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('triage_result') }} — {{ record.species }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-10">
+    <div class="card border-0 shadow-sm bg-white mb-4" style="border-radius: var(--radius-lg);">
+      <!-- Urgency Banner Header -->
+      <div class="card-header text-white py-3 px-4 d-flex flex-wrap justify-content-between align-items-center {% if record.urgency_level == 'emergency' %}bg-danger{% elif record.urgency_level == 'urgent' %}bg-warning text-dark{% else %}bg-success{% endif %}" style="border-radius: var(--radius-lg) var(--radius-lg) 0 0;">
+        <div class="d-flex align-items-center gap-2">
+          <i class="fa-solid fa-stethoscope fs-4"></i>
+          <h4 class="mb-0 fw-bold">{{ t('triage_result') }}</h4>
+        </div>
+        <div>
+          <span class="badge bg-light text-dark fw-bold px-3 py-2">
+            {{ record.species }} | {{ record.created_at.strftime('%d %b %Y, %I:%M %p') }}
+          </span>
+        </div>
+      </div>
+
+      <div class="card-body p-4 p-md-5">
+        <!-- Prominent Urgency Box -->
+        <div class="p-4 rounded-3 mb-4 border {% if record.urgency_level == 'emergency' %}bg-danger-subtle border-danger{% elif record.urgency_level == 'urgent' %}bg-warning-subtle border-warning{% else %}bg-success-subtle border-success{% endif %}">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+              <span class="text-uppercase small fw-bold text-muted">{{ t('urgency_level') }}</span>
+              <h2 class="fw-bold mb-1 {% if record.urgency_level == 'emergency' %}text-danger{% elif record.urgency_level == 'urgent' %}text-dark{% else %}text-success{% endif %}">
+                {% if record.urgency_level == 'emergency' %}
+                <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ t('emergency') }}
+                {% elif record.urgency_level == 'urgent' %}
+                <i class="fa-solid fa-clock me-2 text-warning"></i> {{ t('urgent') }}
+                {% else %}
+                <i class="fa-solid fa-circle-check me-2 text-success"></i> {{ t('monitor') }}
+                {% endif %}
+              </h2>
+              <p class="small text-muted mb-0">
+                Evaluation for <strong>{{ record.species }}</strong> (Age/Weight: {{ record.age_approx or 'Not specified' }}).
+              </p>
+            </div>
+
+            <div>
+              {% if record.requires_immediate_vet or record.urgency_level == 'emergency' %}
+              <a href="tel:1962" class="btn btn-danger btn-touch-lg fw-bold shadow animate-pulse">
+                <i class="fa-solid fa-phone-volume me-2"></i> DIAL 1962 NOW
+              </a>
+              {% else %}
+              <a href="tel:1962" class="btn btn-outline-danger fw-bold">
+                <i class="fa-solid fa-phone me-1"></i> Helpline 1962
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Clinical Warning Observations Identified -->
+        <div class="mb-4">
+          <h5 class="fw-bold text-dark mb-3">
+            <i class="fa-solid fa-notes-medical text-danger me-2"></i> Observations Triggering This Triage Category
+          </h5>
+          <div class="p-3 rounded-3 bg-light border">
+            <ul class="mb-0 small" style="line-height: 1.8;">
+              {% if eval_data and eval_data.reasons %}
+                {% for r in eval_data.reasons %}
+                <li><strong>{{ r }}</strong></li>
+                {% endfor %}
+              {% else %}
+                <li>Symptoms: {{ record.symptoms_selected or 'Clinical observations submitted' }}</li>
+                <li>Appetite: {{ record.appetite | capitalize }} | Behavior: {{ record.behavior | capitalize }}</li>
+                <li>Breathing: {{ record.breathing_status | capitalize }} | Standing: {{ record.standing_status | capitalize }}</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+
+        <!-- Safe Interim Supportive Care (First-Aid & Shelter) -->
+        <div class="mb-4">
+          <h4 class="fw-bold text-dark mb-3">
+            <i class="fa-solid fa-hand-holding-medical text-success me-2"></i> {{ t('immediate_actions') }}
+          </h4>
+          <div class="p-4 rounded-3 border bg-white" style="border-left: 5px solid #2e7d32 !important;">
+            <div class="text-dark small" style="white-space: pre-line; line-height: 1.8;">
+              {{ record.immediate_guidance }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Strict Prohibitions / What NOT to do -->
+        <div class="mb-4">
+          <h4 class="fw-bold text-dark mb-3">
+            <i class="fa-solid fa-ban text-danger me-2"></i> {{ t('what_not_to_do') }}
+          </h4>
+          <div class="p-4 rounded-3 border bg-white" style="border-left: 5px solid #c62828 !important;">
+            <div class="text-danger-emphasis small" style="white-space: pre-line; line-height: 1.8;">
+              {{ record.what_not_to_do or '• Do NOT force-feed or drench liquids if animal is choking or unable to stand.\n• Do NOT inject antibiotics or scheduled medicines without a veterinarian.' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Strict Veterinary Safeguard Notice -->
+        <div class="vet-safeguard-box mb-4">
+          <div class="d-flex align-items-start gap-2">
+            <i class="fa-solid fa-shield-halved text-danger fs-5 mt-1"></i>
+            <div>
+              <strong>Responsible Veterinary Standard:</strong>
+              {{ t('animal_disclaimer') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+          <a href="{{ url_for('animal.triage') }}" class="btn btn-outline-secondary fw-bold">
+            <i class="fa-solid fa-arrow-left me-1"></i> Check Another Animal
+          </a>
+          <div class="d-flex gap-2">
+            <a href="{{ url_for('vets.index') }}" class="btn btn-farmer-danger fw-bold">
+              <i class="fa-solid fa-hospital-user me-1"></i> Find Nearest Veterinary Dispensary
+            </a>
+            <button onclick="window.print();" class="btn btn-secondary fw-bold">
+              <i class="fa-solid fa-print me-1"></i> Print Report
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

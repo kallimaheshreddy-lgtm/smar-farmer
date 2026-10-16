@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('fertilizer_guide') }} — Smart Farmer AI{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm bg-white mb-4" style="border-radius: var(--radius-lg);">
+  <div class="card-body p-4 p-md-5">
+    <div class="mb-4 pb-2 border-bottom">
+      <h2 class="fw-bold text-dark mb-1"><i class="fa-solid fa-flask-vial text-warning me-2"></i> {{ t('fertilizer_guide') }} & Soil Nutrition</h2>
+      <p class="text-muted small mb-0">Scientific N:P:K dosage recommendations, split application schedules, and organic manure integration.</p>
+    </div>
+
+    <!-- Golden Rules of Fertilizer Application -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="p-3 rounded-3 bg-light border h-100">
+          <h6 class="fw-bold text-success mb-1"><i class="fa-solid fa-droplet me-1"></i> Soil Moisture Rule</h6>
+          <p class="small text-muted mb-0">Never broadcast dry granular urea or chemical fertilizers into bone-dry soil or standing deep water. Ensure adequate moist root zone.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 rounded-3 bg-light border h-100">
+          <h6 class="fw-bold text-warning mb-1"><i class="fa-solid fa-split me-1"></i> Split Nitrogen Timing</h6>
+          <p class="small text-muted mb-0">Splitting urea into 3-4 stages (Basal, Tillering/Squaring, Flowering) boosts nutrient use efficiency from 30% to over 60%.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 rounded-3 bg-light border h-100">
+          <h6 class="fw-bold text-danger mb-1"><i class="fa-solid fa-ban me-1"></i> Zinc & Phosphate Separation</h6>
+          <p class="small text-muted mb-0">Never mix Zinc Sulphate directly with DAP or SSP in the same spray tank; it precipitates into an unavailable chemical sludge.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Crop-by-Crop Scientific Fertilizer Cards -->
+    <h4 class="fw-bold text-dark mb-3">Crop-Wise Recommended Nutrient Schedules</h4>
+    {% if guides %}
+    <div class="row g-4">
+      {% for g in guides %}
+      <div class="col-lg-6">
+        <div class="p-4 rounded-3 border bg-light h-100 shadow-sm" style="border-left: 5px solid #f57f17 !important;">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="fw-bold text-dark mb-0">{{ g.title }}</h5>
+            <span class="badge bg-warning-subtle text-dark fw-bold">{{ g.crop_or_animal }}</span>
+          </div>
+
+          <div class="my-3 p-3 bg-white rounded border">
+            <strong class="small text-warning-emphasis d-block mb-1"><i class="fa-solid fa-clock-rotate-left me-1"></i> Split Dosage & Timings:</strong>
+            <div class="small text-dark" style="white-space: pre-line; line-height: 1.7;">
+              {{ g.management_practices }}
+            </div>
+          </div>
+
+          {% if g.organic_options %}
+          <div class="mb-3">
+            <strong class="small text-success"><i class="fa-solid fa-leaf me-1"></i> Organic Manure & Bio-Fertilizers:</strong>
+            <p class="small text-muted mb-0">{{ g.organic_options }}</p>
+          </div>
+          {% endif %}
+
+          {% if g.safety_precautions %}
+          <div class="mb-3 p-2 rounded bg-warning-subtle text-dark small">
+            <strong><i class="fa-solid fa-triangle-exclamation text-danger me-1"></i> Precaution:</strong> {{ g.safety_precautions }}
+          </div>
+          {% endif %}
+
+          <div class="pt-2 border-top d-flex justify-content-between align-items-center text-muted" style="font-size: 0.78rem;">
+            <span><i class="fa-solid fa-building-columns text-primary me-1"></i> {{ g.source_institution }}</span>
+            <span class="badge bg-light text-dark border">{{ g.last_reviewed_date }}</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted small">No fertilizer schedules loaded.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

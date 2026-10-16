@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Log Farm Activity — Smart Farmer AI{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm bg-white" style="border-radius: var(--radius-lg);">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <h3 class="fw-bold text-dark"><i class="fa-solid fa-clipboard-check text-primary me-2"></i> Log Farm Activity & Expense</h3>
+        <p class="text-muted small">Record field operations such as irrigation, fertilizer, spraying, harvest, or labor cost.</p>
+      </div>
+      <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('farm.add_activity') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Select Crop Plot</label>
+            <select name="crop_id" class="form-select">
+              <option value="">General Farm Operation</option>
+              {% for c in crops %}
+              <option value="{{ c.id }}">{{ c.name }} ({{ c.field_name }}, {{ c.area_acres }} Acres)</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Activity Type <span class="text-danger">*</span></label>
+              <select name="activity_type" class="form-select" required>
+                <option value="Irrigation">Irrigation</option>
+                <option value="Fertilizer Application">Fertilizer Application</option>
+                <option value="Bio-Pesticide / Spray">Bio-Pesticide / Spraying</option>
+                <option value="Weeding / Hoeing">Weeding / Inter-cultivation</option>
+                <option value="Harvest & Threshing">Harvest & Threshing</option>
+                <option value="Seed Sowing">Seed Sowing / Nursery</option>
+                <option value="Farm Machinery / Fuel">Farm Machinery / Fuel</option>
+                <option value="Other Expense">Other Expense</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Operation Date</label>
+              <input type="date" name="activity_date" class="form-control" value="{{ current_date }}">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Description of Activity <span class="text-danger">*</span></label>
+            <textarea name="description" class="form-control" rows="2" placeholder="e.g. Applied 1 bag Urea + 25 kg MOP at first top dressing" required></textarea>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Quantity / Hours (Optional)</label>
+              <input type="text" name="quantity" class="form-control" placeholder="e.g. 50 kg, 4 hours borewell, 2 laborers">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Cost Incurred (₹)</label>
+              <input type="number" step="1" name="cost" class="form-control" placeholder="e.g. 1200" value="0">
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('farm.index') }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-farmer-primary fw-bold px-4">Save Activity Record</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

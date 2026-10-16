@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Knowledge Base — Smart Farmer AI{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm bg-white mb-4" style="border-radius: var(--radius-lg);">
+  <div class="card-body p-4 p-md-5">
+    <div class="text-center max-w-700 mx-auto mb-4">
+      <h2 class="fw-bold text-dark mb-2">
+        <i class="fa-solid fa-book-bookmark text-success me-2"></i> Verified Agricultural & Animal Health Knowledge
+      </h2>
+      <p class="text-muted small">
+        Sourced exclusively from reputable Indian institutions: ICAR, IVRI, State Agricultural Universities (ANGRAU, TNAU, PJTSAU), and DAHD.
+      </p>
+
+      <!-- Search Bar -->
+      <form method="GET" action="{{ url_for('knowledge.index') }}" class="row g-2 justify-content-center mt-3">
+        <div class="col-md-7">
+          <input type="text" name="q" class="form-control form-control-lg" placeholder="{{ t('search_placeholder') }}" value="{{ query }}">
+        </div>
+        <div class="col-md-3">
+          <select name="category" class="form-select form-select-lg">
+            <option value="all" {% if current_category == 'all' %}selected{% endif %}>{{ t('category_filter') }}</option>
+            <option value="crop_disease" {% if current_category == 'crop_disease' %}selected{% endif %}>Plant Diseases</option>
+            <option value="pest" {% if current_category == 'pest' %}selected{% endif %}>Pest Management</option>
+            <option value="fertilizer" {% if current_category == 'fertilizer' %}selected{% endif %}>Fertilizer Schedules</option>
+            <option value="animal_health" {% if current_category == 'animal_health' %}selected{% endif %}>Animal Health</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-farmer-primary btn-lg w-100 fw-bold">Search</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Category Quick Filters -->
+    <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+      <a href="{{ url_for('knowledge.index', category='all') }}" class="btn btn-sm {% if current_category == 'all' %}btn-success{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">All Categories</a>
+      <a href="{{ url_for('knowledge.index', category='crop_disease') }}" class="btn btn-sm {% if current_category == 'crop_disease' %}btn-success{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Crop Diseases</a>
+      <a href="{{ url_for('knowledge.index', category='pest') }}" class="btn btn-sm {% if current_category == 'pest' %}btn-success{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Pest Control (IPM)</a>
+      <a href="{{ url_for('knowledge.index', category='fertilizer') }}" class="btn btn-sm {% if current_category == 'fertilizer' %}btn-success{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Fertilizer Guide</a>
+      <a href="{{ url_for('knowledge.index', category='animal_health') }}" class="btn btn-sm {% if current_category == 'animal_health' %}btn-success{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Livestock Health</a>
+    </div>
+
+    <!-- Articles Grid -->
+    {% if articles %}
+    <div class="row g-4">
+      {% for art in articles %}
+      <div class="col-md-6 col-lg-4">
+        <div class="farmer-card d-flex flex-column justify-content-between">
+          <div>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge {% if art.category == 'crop_disease' %}bg-success-subtle text-success{% elif art.category == 'animal_health' %}bg-danger-subtle text-danger{% elif art.category == 'fertilizer' %}bg-warning-subtle text-warning{% else %}bg-info-subtle text-info{% endif %}">
+                {{ art.category | replace('_', ' ') | capitalize }}
+              </span>
+              <span class="small text-muted" style="font-size: 0.76rem;">{{ art.last_reviewed_date }}</span>
+            </div>
+            <h5 class="fw-bold text-dark mb-1">{{ art.title }}</h5>
+            <p class="small text-muted mb-2">Target: <strong>{{ art.crop_or_animal }}</strong></p>
+            <p class="small text-muted mb-3" style="line-height: 1.5;">
+              {{ (art.symptoms_description or art.management_practices)[:140] }}...
+            </p>
+          </div>
+          <div>
+            <div class="small text-muted border-top pt-2 mb-2" style="font-size: 0.75rem;">
+              <i class="fa-solid fa-building-columns text-primary me-1"></i> {{ art.source_institution }}
+            </div>
+            <a href="{{ url_for('knowledge.view_article', article_id=art.id) }}" class="btn btn-sm btn-outline-success w-100 fw-bold">
+              Read Verified Guide &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+      <i class="fa-solid fa-circle-question text-muted fs-1 mb-3"></i>
+      <h5 class="fw-bold text-dark">No knowledge base articles matched your search</h5>
+      <p class="text-muted small mb-3">Try searching for other crops (e.g., Rice, Cotton, Tomato) or clear your filter.</p>
+      <a href="{{ url_for('knowledge.index') }}" class="btn btn-sm btn-farmer-primary">Reset Filter</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

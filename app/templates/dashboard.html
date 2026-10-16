@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('dashboard') }} — {{ current_user.name }}{% endblock %}
+
+{% block content %}
+<!-- Dashboard Welcome Banner -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+  <div>
+    <h2 class="fw-bold text-dark mb-1">
+      <i class="fa-solid fa-seedling text-success me-2"></i> {{ t('welcome') }}, {{ current_user.name }}
+    </h2>
+    <p class="text-muted small mb-0">
+      <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ current_user.district }}, {{ current_user.state }} | Farmer ID #{{ current_user.id }}
+    </p>
+  </div>
+  <div class="mt-3 mt-md-0 d-flex gap-2">
+    <a href="{{ url_for('plant.checker') }}" class="btn btn-farmer-primary">
+      <i class="fa-solid fa-camera me-1"></i> {{ t('check_plant') }}
+    </a>
+    <a href="{{ url_for('animal.triage') }}" class="btn btn-farmer-danger">
+      <i class="fa-solid fa-cow me-1"></i> {{ t('check_animal') }}
+    </a>
+  </div>
+</div>
+
+<!-- 4 Key Stat Metric Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <div class="stat-number">{{ crops_count }}</div>
+          <div class="stat-label">{{ t('active_crops') }}</div>
+        </div>
+        <div class="card-icon-box card-icon-green mb-0" style="width: 48px; height: 48px; font-size: 1.4rem;">
+          <i class="fa-solid fa-wheat-awn"></i>
+        </div>
+      </div>
+      <div class="mt-2">
+        <a href="{{ url_for('farm.index') }}" class="small text-success text-decoration-none fw-bold">Manage Fields &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <div class="stat-number">{{ livestock_count }}</div>
+          <div class="stat-label">{{ t('livestock_head') }}</div>
+        </div>
+        <div class="card-icon-box card-icon-amber mb-0" style="width: 48px; height: 48px; font-size: 1.4rem;">
+          <i class="fa-solid fa-cow"></i>
+        </div>
+      </div>
+      <div class="mt-2">
+        <a href="{{ url_for('livestock.index') }}" class="small text-warning text-decoration-none fw-bold">Manage Livestock &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <div class="stat-number">{{ recent_assessments|length }}</div>
+          <div class="stat-label">Plant Checks</div>
+        </div>
+        <div class="card-icon-box card-icon-blue mb-0" style="width: 48px; height: 48px; font-size: 1.4rem;">
+          <i class="fa-solid fa-leaf"></i>
+        </div>
+      </div>
+      <div class="mt-2">
+        <a href="{{ url_for('plant.history') }}" class="small text-primary text-decoration-none fw-bold">View History &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <div class="stat-number">{{ recent_triages|length }}</div>
+          <div class="stat-label">Animal Triage</div>
+        </div>
+        <div class="card-icon-box card-icon-red mb-0" style="width: 48px; height: 48px; font-size: 1.4rem;">
+          <i class="fa-solid fa-notes-medical"></i>
+        </div>
+      </div>
+      <div class="mt-2">
+        <a href="{{ url_for('animal.history') }}" class="small text-danger text-decoration-none fw-bold">View Triage Logs &rarr;</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Weather Snapshot & Quick Action Strip -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-8">
+    <!-- Active Crops Overview -->
+    <div class="card border-0 shadow-sm h-100 bg-white" style="border-radius: var(--radius-lg);">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-tractor text-success me-2"></i> {{ t('view_crops') }}</h5>
+        <a href="{{ url_for('farm.add_crop') }}" class="btn btn-sm btn-outline-success fw-bold">
+          <i class="fa-solid fa-plus me-1"></i> Add Crop
+        </a>
+      </div>
+      <div class="card-body px-4 pb-4">
+        {% if my_crops %}
+        <div class="row g-3">
+          {% for crop in my_crops %}
+          <div class="col-md-6">
+            <div class="p-3 rounded-3 border bg-light h-100">
+              <div class="d-flex justify-content-between align-items-start">
+                <h6 class="fw-bold mb-1 text-dark">{{ crop.name }} <span class="text-muted fw-normal">({{ crop.variety or 'Standard' }})</span></h6>
+                <span class="badge bg-success-subtle text-success">{{ crop.status }}</span>
+              </div>
+              <p class="small text-muted mb-2">
+                Field: <strong>{{ crop.field_name }}</strong> | Area: <strong>{{ crop.area_acres }} Acres</strong>
+              </p>
+              <div class="d-flex gap-2">
+                <a href="{{ url_for('farm.edit_crop', crop_id=crop.id) }}" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.78rem;">Edit</a>
+                <a href="{{ url_for('farm.add_activity') }}?crop_id={{ crop.id }}" class="btn btn-sm btn-outline-success py-0 px-2" style="font-size: 0.78rem;">Log Activity</a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="fa-solid fa-seedling text-muted fs-1 mb-2"></i>
+          <p class="text-muted mb-2">No active crops registered yet.</p>
+          <a href="{{ url_for('farm.add_crop') }}" class="btn btn-sm btn-farmer-primary">Register Your First Crop</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Local Weather Advisory -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm h-100 bg-white" style="border-radius: var(--radius-lg); border-top: 4px solid #0288d1 !important;">
+      <div class="card-body p-4">
+        <h5 class="fw-bold mb-2 text-dark"><i class="fa-solid fa-cloud-sun text-info me-2"></i> {{ t('todays_weather') }}</h5>
+        <p class="small text-muted mb-3"><i class="fa-solid fa-location-dot text-danger me-1"></i> {{ weather.location_name }}</p>
+
+        {% if weather.configured %}
+        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 mb-3">
+          <div>
+            <div class="fs-2 fw-bold text-dark">{{ weather.temperature }}°C</div>
+            <div class="small text-muted">{{ weather.description }}</div>
+          </div>
+          <div class="text-end small text-muted">
+            <div>Humidity: <strong>{{ weather.humidity }}%</strong></div>
+            <div>Wind: <strong>{{ weather.wind_speed }} m/s</strong></div>
+          </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info py-2 px-3 small mb-3">
+          {{ weather.notice }}
+        </div>
+        {% endif %}
+
+        <h6 class="fw-bold small text-dark mb-2">Key Farm Advisories:</h6>
+        <div class="vstack gap-2">
+          {% for adv in weather.advisories[:2] %}
+          <div class="p-2 rounded bg-{{ adv.alert_type }}-subtle text-{{ adv.alert_type }} small">
+            <strong>{{ adv.category }}:</strong> {{ adv.message }}
+          </div>
+          {% endfor %}
+        </div>
+        <a href="{{ url_for('weather.index') }}" class="btn btn-sm btn-outline-primary w-100 mt-3 fw-bold">Full Weather Advisory &rarr;</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Plant Checks & Recent Animal Triage Logs -->
+<div class="row g-4">
+  <!-- Recent Plant Health Checks -->
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100 bg-white" style="border-radius: var(--radius-lg);">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-leaf text-success me-2"></i> {{ t('recent_assessments') }}</h5>
+        <a href="{{ url_for('plant.history') }}" class="small text-success text-decoration-none fw-bold">All History &rarr;</a>
+      </div>
+      <div class="card-body px-4 pb-4">
+        {% if recent_assessments %}
+        <div class="list-group list-group-flush">
+          {% for item in recent_assessments %}
+          <div class="list-group-item px-0 py-3 border-bottom">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="fw-bold mb-1 text-dark">{{ item.detected_issue }}</h6>
+                <p class="small text-muted mb-0">
+                  Crop: <strong>{{ item.crop_type }}</strong> | {{ item.created_at.strftime('%d %b %Y') }}
+                </p>
+                <span class="badge bg-light text-dark border small mt-1">{{ item.confidence }}</span>
+              </div>
+              <a href="{{ url_for('plant.view_assessment', assessment_id=item.id) }}" class="btn btn-sm btn-outline-success">View</a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted small py-3 mb-0">No plant disease checks recorded yet. <a href="{{ url_for('plant.checker') }}">Run a check now</a>.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Animal Triage Checks -->
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100 bg-white" style="border-radius: var(--radius-lg);">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-cow text-warning me-2"></i> {{ t('recent_triage') }}</h5>
+        <a href="{{ url_for('animal.history') }}" class="small text-danger text-decoration-none fw-bold">All History &rarr;</a>
+      </div>
+      <div class="card-body px-4 pb-4">
+        {% if recent_triages %}
+        <div class="list-group list-group-flush">
+          {% for item in recent_triages %}
+          <div class="list-group-item px-0 py-3 border-bottom">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="fw-bold mb-1 text-dark">
+                  {{ item.species }}
+                  {% if item.urgency_level == 'emergency' %}
+                  <span class="badge-emergency ms-2">EMERGENCY</span>
+                  {% elif item.urgency_level == 'urgent' %}
+                  <span class="badge-urgent ms-2">URGENT</span>
+                  {% else %}
+                  <span class="badge-monitor ms-2">MONITOR</span>
+                  {% endif %}
+                </h6>
+                <p class="small text-muted mb-0">
+                  Symptoms: {{ item.symptoms_selected or 'Observation recorded' }} | {{ item.created_at.strftime('%d %b %Y') }}
+                </p>
+              </div>
+              <a href="{{ url_for('animal.view_record', record_id=item.id) }}" class="btn btn-sm btn-outline-danger">Details</a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted small py-3 mb-0">No animal triage records logged yet. <a href="{{ url_for('animal.triage') }}">Perform animal health check</a>.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

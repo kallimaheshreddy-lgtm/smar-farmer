@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action }} Veterinary Directory Entry — Admin{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm bg-white" style="border-radius: var(--radius-lg);">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <h3 class="fw-bold text-dark"><i class="fa-solid fa-hospital text-danger me-2"></i> {{ action }} Veterinary Directory Entry</h3>
+        <p class="text-muted small">Maintain official contact details and helpline numbers for farmers.</p>
+      </div>
+      <div class="card-body p-4">
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Hospital / Dispensary / KVK Name <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control" placeholder="e.g. Govt Veterinary Polyclinic - Warangal" value="{{ contact.name if contact else '' }}" required>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Facility Type</label>
+              <select name="contact_type" class="form-select">
+                <option value="Govt Veterinary Hospital" {% if contact and contact.contact_type == 'Govt Veterinary Hospital' %}selected{% endif %}>Govt Veterinary Hospital</option>
+                <option value="Govt Veterinary Dispensary" {% if contact and contact.contact_type == 'Govt Veterinary Dispensary' %}selected{% endif %}>Govt Veterinary Dispensary</option>
+                <option value="KVK Extension Center" {% if contact and contact.contact_type == 'KVK Extension Center' %}selected{% endif %}>KVK Extension Center</option>
+                <option value="Mobile Veterinary Clinic" {% if contact and contact.contact_type == 'Mobile Veterinary Clinic' %}selected{% endif %}>Mobile Veterinary Clinic</option>
+                <option value="Registered Private Veterinarian" {% if contact and contact.contact_type == 'Registered Private Veterinarian' %}selected{% endif %}>Registered Private Veterinarian</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">State <span class="text-danger">*</span></label>
+              <input type="text" name="state" class="form-control" placeholder="e.g. Telangana" value="{{ contact.state if contact else 'Telangana' }}" required>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">District <span class="text-danger">*</span></label>
+              <input type="text" name="district" class="form-control" placeholder="e.g. Warangal" value="{{ contact.district if contact else 'Warangal' }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Office Phone Number <span class="text-danger">*</span></label>
+              <input type="text" name="phone" class="form-control" placeholder="e.g. 0870-2456789" value="{{ contact.phone if contact else '' }}" required>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Emergency / Toll-Free Phone</label>
+              <input type="text" name="emergency_phone" class="form-control" placeholder="e.g. 1962" value="{{ contact.emergency_phone if contact else '1962' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Official Email</label>
+              <input type="email" name="email" class="form-control" placeholder="e.g. vet@telangana.gov.in" value="{{ contact.email if contact else '' }}">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Address / Landmark</label>
+            <textarea name="address" class="form-control" rows="2" placeholder="Street, locality, pin code...">{{ contact.address if contact else '' }}</textarea>
+          </div>
+
+          {% if action == 'Edit' %}
+          <div class="form-check mb-4">
+            <input class="form-check-input" type="checkbox" name="is_active" id="isVetActive" {% if contact.is_active %}checked{% endif %}>
+            <label class="form-check-label fw-semibold" for="isVetActive">Active (Display in farmer directory)</label>
+          </div>
+          {% endif %}
+
+          <div class="d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('admin.vets_list') }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-farmer-danger fw-bold px-4">{{ action }} Directory Entry</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

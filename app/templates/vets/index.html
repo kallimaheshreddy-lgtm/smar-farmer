@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('vet_contacts') }} — Smart Farmer AI{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm bg-white mb-4" style="border-radius: var(--radius-lg);">
+  <div class="card-body p-4 p-md-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+      <div>
+        <h2 class="fw-bold text-dark mb-1"><i class="fa-solid fa-hospital-user text-danger me-2"></i> {{ t('vet_contacts') }} & KVK Centers</h2>
+        <p class="text-muted small mb-0">Government Veterinary Dispensaries, Polyclinics, and Krishi Vigyan Kendra extension officers across India.</p>
+      </div>
+      <div>
+        <a href="tel:1962" class="btn btn-danger btn-sm fw-bold">
+          <i class="fa-solid fa-phone me-1"></i> National Animal Helpline: 1962
+        </a>
+      </div>
+    </div>
+
+    <!-- State & District Filters -->
+    <div class="p-3 rounded-3 bg-light border mb-4">
+      <form method="GET" action="{{ url_for('vets.index') }}" class="row g-2 align-items-center">
+        <div class="col-md-5">
+          <label class="form-label small mb-1 fw-bold">Filter by State:</label>
+          <select name="state" class="form-select form-select-sm">
+            <option value="all">All States / National</option>
+            {% for s in states %}
+            <option value="{{ s }}" {% if selected_state == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-5">
+          <label class="form-label small mb-1 fw-bold">District / City Search:</label>
+          <input type="text" name="district" class="form-control form-control-sm" placeholder="e.g. Warangal, Guntur, Pune..." value="{{ district_query }}">
+        </div>
+        <div class="col-md-2 mt-auto">
+          <button type="submit" class="btn btn-farmer-primary btn-sm w-100 fw-bold">Filter Directory</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Contact Cards Grid -->
+    {% if contacts %}
+    <div class="row g-4">
+      {% for c in contacts %}
+      <div class="col-md-6 col-lg-4">
+        <div class="p-4 rounded-3 border bg-light h-100 shadow-sm d-flex flex-column justify-content-between" style="border-left: 5px solid #c62828 !important;">
+          <div>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge bg-danger-subtle text-danger fw-bold">{{ c.contact_type }}</span>
+              <span class="badge bg-light text-dark border">{{ c.state }}</span>
+            </div>
+            <h5 class="fw-bold text-dark mb-1">{{ c.name }}</h5>
+            <p class="small text-muted mb-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> {{ c.district }}, {{ c.state }}</p>
+            {% if c.address %}
+            <p class="small text-muted mb-3" style="font-size: 0.8rem;">{{ c.address }}</p>
+            {% endif %}
+          </div>
+
+          <div class="border-top pt-3 mt-2">
+            <div class="d-flex gap-2 mb-2">
+              <a href="tel:{{ c.phone }}" class="btn btn-sm btn-success fw-bold flex-grow-1">
+                <i class="fa-solid fa-phone me-1"></i> Call {{ c.phone }}
+              </a>
+              {% if c.emergency_phone %}
+              <a href="tel:{{ c.emergency_phone }}" class="btn btn-sm btn-danger fw-bold" title="Emergency Hotline">
+                <i class="fa-solid fa-truck-medical"></i> {{ c.emergency_phone }}
+              </a>
+              {% endif %}
+            </div>
+            {% if c.email %}
+            <div class="small text-muted text-truncate" style="font-size: 0.76rem;">
+              <i class="fa-solid fa-envelope me-1"></i> {{ c.email }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-4">
+      <p class="text-muted">No veterinary or KVK contacts found for the selected state/district.</p>
+      <a href="{{ url_for('vets.index') }}" class="btn btn-sm btn-outline-danger">Reset Filter</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

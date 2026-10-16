@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}File Too Large — Smart Farmer AI{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+  <div class="col-md-7 text-center">
+    <div class="card border-0 shadow-sm bg-white p-5" style="border-radius: var(--radius-lg);">
+      <div class="display-1 fw-bold text-warning mb-2">413</div>
+      <h3 class="fw-bold text-dark mb-2">Upload Exceeds Maximum Size Limit</h3>
+      <p class="text-muted small mb-4">{{ error or "The crop photo you uploaded exceeds the maximum allowed 8MB size limit. Please upload a smaller image file." }}</p>
+      <div>
+        <a href="{{ url_for('plant.checker') }}" class="btn btn-farmer-primary">Try Again with Smaller Photo</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

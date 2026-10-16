@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Administrator Dashboard — Smart Farmer AI{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+  <div>
+    <h2 class="fw-bold text-dark mb-1"><i class="fa-solid fa-user-shield text-danger me-2"></i> Administrator Control Portal</h2>
+    <p class="text-muted small mb-0">Platform oversight, verified scientific knowledge base curation, and veterinary directory maintenance.</p>
+  </div>
+  <div class="mt-3 mt-md-0 d-flex gap-2">
+    <a href="{{ url_for('admin.knowledge_add') }}" class="btn btn-farmer-primary">
+      <i class="fa-solid fa-plus me-1"></i> Add Knowledge Article
+    </a>
+    <a href="{{ url_for('admin.vets_add') }}" class="btn btn-farmer-danger">
+      <i class="fa-solid fa-hospital-user me-1"></i> Add Vet Contact
+    </a>
+  </div>
+</div>
+
+<!-- High-Level Platform Statistics -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="stat-card text-center p-3">
+      <div class="stat-number fs-3">{{ total_users }}</div>
+      <div class="stat-label">Farmers</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="stat-card text-center p-3">
+      <div class="stat-number fs-3 text-success">{{ total_crops }}</div>
+      <div class="stat-label">Crops</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="stat-card text-center p-3">
+      <div class="stat-number fs-3 text-warning">{{ total_livestock }}</div>
+      <div class="stat-label">Livestock</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="stat-card text-center p-3">
+      <div class="stat-number fs-3 text-primary">{{ total_assessments }}</div>
+      <div class="stat-label">Plant Checks</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="stat-card text-center p-3">
+      <div class="stat-number fs-3 text-danger">{{ total_triages }}</div>
+      <div class="stat-label">Animal Triage</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="stat-card text-center p-3">
+      <div class="stat-number fs-3 text-secondary">{{ total_articles }}</div>
+      <div class="stat-label">Articles</div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Management Links & Quick Controls -->
+<div class="row g-4 mb-4">
+  <div class="col-md-6">
+    <div class="farmer-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-book-open text-success me-2"></i> Knowledge Base Curation</h5>
+        <a href="{{ url_for('admin.knowledge_list') }}" class="btn btn-sm btn-outline-success">Manage All ({{ total_articles }})</a>
+      </div>
+      <p class="small text-muted mb-3">
+        Review, update, and deactivate agricultural recommendations. Ensure only verified university and ICAR research guides are active.
+      </p>
+      <div class="d-flex gap-2">
+        <a href="{{ url_for('admin.knowledge_list') }}" class="btn btn-sm btn-farmer-primary">Browse & Edit Articles</a>
+        <a href="{{ url_for('admin.knowledge_add') }}" class="btn btn-sm btn-outline-secondary">+ New Verified Entry</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="farmer-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-hospital-user text-danger me-2"></i> Veterinary & KVK Directory</h5>
+        <a href="{{ url_for('admin.vets_list') }}" class="btn btn-sm btn-outline-danger">Manage All ({{ total_vets }})</a>
+      </div>
+      <p class="small text-muted mb-3">
+        Manage official government veterinary dispensaries, emergency polyclinics, and KVK contact numbers across states.
+      </p>
+      <div class="d-flex gap-2">
+        <a href="{{ url_for('admin.vets_list') }}" class="btn btn-sm btn-farmer-danger">Browse & Edit Contacts</a>
+        <a href="{{ url_for('admin.vets_add') }}" class="btn btn-sm btn-outline-secondary">+ New Contact</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent System Submissions Review -->
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm bg-white" style="border-radius: var(--radius-lg);">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
+        <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-leaf text-success me-2"></i> Recent Plant Assessments</h5>
+      </div>
+      <div class="card-body px-4 pb-4">
+        {% if recent_assessments %}
+        <div class="list-group list-group-flush">
+          {% for a in recent_assessments %}
+          <div class="list-group-item px-0 py-2 border-bottom small">
+            <div class="d-flex justify-content-between">
+              <strong>{{ a.crop_type }}: {{ a.detected_issue }}</strong>
+              <span class="text-muted">{{ a.created_at.strftime('%d %b') }}</span>
+            </div>
+            <div class="text-muted small">Confidence: {{ a.confidence }} | Mode: {{ a.assessment_mode }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted small mb-0">No assessments recorded.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm bg-white" style="border-radius: var(--radius-lg);">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
+        <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-cow text-warning me-2"></i> Recent Animal Triage Evaluations</h5>
+      </div>
+      <div class="card-body px-4 pb-4">
+        {% if recent_triages %}
+        <div class="list-group list-group-flush">
+          {% for tr in recent_triages %}
+          <div class="list-group-item px-0 py-2 border-bottom small">
+            <div class="d-flex justify-content-between">
+              <strong>{{ tr.species }}: {{ tr.symptoms_selected or 'Triage check' }}</strong>
+              <span class="badge {% if tr.urgency_level == 'emergency' %}bg-danger{% elif tr.urgency_level == 'urgent' %}bg-warning text-dark{% else %}bg-success{% endif %}">
+                {{ tr.urgency_level | upper }}
+              </span>
+            </div>
+            <div class="text-muted small">{{ tr.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted small mb-0">No triage records logged.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('plant_title') }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="card border-0 shadow-sm bg-white" style="border-radius: var(--radius-lg);">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <div class="d-flex align-items-center gap-3">
+          <div class="card-icon-box card-icon-green mb-0">
+            <i class="fa-solid fa-plant-wilt"></i>
+          </div>
+          <div>
+            <h3 class="fw-bold mb-1 text-dark">{{ t('plant_title') }}</h3>
+            <p class="text-muted small mb-0">{{ t('plant_subtitle') }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('plant.checker') }}" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+          <!-- Step 1: Crop Selection & Growth Stage -->
+          <div class="mb-4">
+            <h5 class="fw-bold text-success border-bottom pb-2">
+              <span class="badge bg-success me-2">1</span> {{ t('crop_type') }} & Stage
+            </h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">{{ t('crop_type') }} <span class="text-danger">*</span></label>
+                <select name="crop_type" class="form-select" required>
+                  <option value="">{{ t('select_crop') }}</option>
+                  <option value="Rice">Rice / Paddy (వరి / धान)</option>
+                  <option value="Cotton">Cotton (ప్రత్తి / कपास)</option>
+                  <option value="Tomato">Tomato (టమోటా / टमाटर)</option>
+                  <option value="Chilli">Chilli (మిరప / मिर्च)</option>
+                  <option value="Wheat">Wheat (గోధుమ / गेहूं)</option>
+                  <option value="Maize">Maize / Corn (మొక్కజొన్న / मक्का)</option>
+                  <option value="Potato">Potato (బంగాళాదుంప / आलू)</option>
+                  <option value="Groundnut">Groundnut (వేరుశనగ / मूंगफली)</option>
+                  <option value="Sugarcane">Sugarcane (చెరకు / गन्ना)</option>
+                  <option value="Onion">Onion (ఉల్లిపాయ / प्याज)</option>
+                  <option value="Mango">Mango (మామిడి / आम)</option>
+                  <option value="Mustard">Mustard (ఆవాలు / सरसों)</option>
+                  <option value="Soybean">Soybean (సోయాబీన్ / सोयाबीन)</option>
+                  <option value="Other">Other Horticultural / Field Crop</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">{{ t('growth_stage') }}</label>
+                <select name="growth_stage" class="form-select">
+                  <option value="Vegetative">Vegetative / Tillering Stage</option>
+                  <option value="Seedling / Nursery">Seedling / Nursery</option>
+                  <option value="Flowering / Squaring">Flowering / Squaring Stage</option>
+                  <option value="Fruiting / Grain Filling">Fruiting / Grain Filling</option>
+                  <option value="Maturity / Harvest">Maturity / Near Harvest</option>
+                </select>
+              </div>
+
+              {% if user_crops %}
+              <div class="col-12">
+                <label class="form-label fw-semibold text-muted small">Link to My Farm Plot (Optional):</label>
+                <select name="crop_id" class="form-select form-select-sm">
+                  <option value="">-- Do not link to a saved field --</option>
+                  {% for uc in user_crops %}
+                  <option value="{{ uc.id }}">{{ uc.name }} ({{ uc.field_name }}, {{ uc.area_acres }} Acres)</option>
+                  {% endfor %}
+                </select>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Step 2: Affected Plant Parts & Visible Symptoms Checklist -->
+          <div class="mb-4">
+            <h5 class="fw-bold text-success border-bottom pb-2">
+              <span class="badge bg-success me-2">2</span> {{ t('observed_symptoms') }}
+            </h5>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">{{ t('affected_parts') }}:</label>
+              <div class="d-flex flex-wrap gap-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="affected_parts" value="Leaves" id="partLeaf" checked>
+                  <label class="form-check-label" for="partLeaf">Leaves / Foliage</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="affected_parts" value="Stem / Branches" id="partStem">
+                  <label class="form-check-label" for="partStem">Stem / Branches</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="affected_parts" value="Fruits / Bolls / Pods" id="partFruit">
+                  <label class="form-check-label" for="partFruit">Fruits / Bolls / Pods</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="affected_parts" value="Roots / Collar" id="partRoot">
+                  <label class="form-check-label" for="partRoot">Roots / Collar Region</label>
+                </div>
+              </div>
+            </div>
+
+            <label class="form-label fw-semibold">Check All Symptoms You Notice:</label>
+            <div class="row g-2 mb-3">
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="symptoms" value="spindle boat shaped leaf spots" id="sym1">
+                  <label class="form-check-label" for="sym1">Spindle / Boat-shaped spots with grey center</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="symptoms" value="yellowing wavy margin lesions" id="sym2">
+                  <label class="form-check-label" for="sym2">Yellowing leaf tips with wavy, undulating margins</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="symptoms" value="concentric target board brown rings" id="sym3">
+                  <label class="form-check-label" for="sym3">Concentric brown rings (target-board spots)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="symptoms" value="upward leaf curling crinkling stunted" id="sym4">
+                  <label class="form-check-label" for="sym4">Upward leaf curling, puckering, or stunting</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="symptoms" value="yellow powder pustules rust dust" id="sym5">
+                  <label class="form-check-label" for="sym5">Yellow / rust-colored powder along leaf veins</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="symptoms" value="dieback drying from tip circular dark fruit spot" id="sym6">
+                  <label class="form-check-label" for="sym6">Branch tip die-back or sunken fruit spots</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="symptoms" value="angular water soaked vein spots" id="sym7">
+                  <label class="form-check-label" for="sym7">Angular water-soaked spots bounded by veins</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="symptoms" value="wilting yellowing lower leaves" id="sym8">
+                  <label class="form-check-label" for="sym8">Sudden wilting or drooping despite moist soil</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">{{ t('symptom_duration') }}</label>
+                <input type="number" name="symptom_duration" class="form-control" placeholder="e.g. 3" min="1" max="180">
+              </div>
+              <div class="col-md-8">
+                <label class="form-label fw-semibold">Other Specific Observations (Color, insects, patterns):</label>
+                <input type="text" name="symptoms_notes" class="form-control" placeholder="e.g. Small whiteflies visible under leaves, spots appeared after rain">
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Photo Upload with Live Preview -->
+          <div class="mb-4">
+            <h5 class="fw-bold text-success border-bottom pb-2">
+              <span class="badge bg-success me-2">3</span> {{ t('upload_image') }}
+            </h5>
+            <div class="upload-dropzone mb-3" onclick="document.getElementById('plantImageInput').click();">
+              <i class="fa-solid fa-cloud-arrow-up fs-1 text-success mb-2"></i>
+              <h6 class="fw-bold text-dark mb-1">Click to Select or Take Photo of Affected Plant</h6>
+              <p class="text-muted small mb-0">Supported formats: JPG, PNG, WEBP (Maximum 8MB). Capture clear closeup in daylight.</p>
+              <input type="file" id="plantImageInput" name="plant_image" class="d-none" accept="image/*">
+            </div>
+
+            <div id="previewContainer" class="preview-container text-center mb-3" style="display: none;">
+              <p class="small text-muted mb-1 fw-bold">Selected Image Preview:</p>
+              <img id="imagePreview" src="" alt="Selected Plant Image Preview" class="img-fluid">
+            </div>
+          </div>
+
+          <!-- Important Agronomic Disclaimer -->
+          <div class="disclaimer-box mb-4">
+            <div class="d-flex align-items-start gap-2">
+              <i class="fa-solid fa-circle-exclamation text-warning fs-5 mt-1"></i>
+              <div>
+                <strong>Preliminary Screening Notice:</strong>
+                {{ t('plant_disclaimer') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="d-grid">
+            <button type="submit" class="btn btn-farmer-primary btn-touch-lg fw-bold">
+              <i class="fa-solid fa-microscope me-2"></i> {{ t('assess_button') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

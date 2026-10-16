@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action }} Livestock Profile — Smart Farmer AI{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm bg-white" style="border-radius: var(--radius-lg);">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <h3 class="fw-bold text-dark"><i class="fa-solid fa-cow text-warning me-2"></i> {{ action }} Livestock Profile</h3>
+        <p class="text-muted small">Maintain identification, breed, and health records for your domestic animals.</p>
+      </div>
+      <div class="card-body p-4">
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Tag ID / Ear Tag Number <span class="text-danger">*</span></label>
+              <input type="text" name="tag_id" class="form-control" placeholder="e.g. IN-TS-04589 or Cow-1" value="{{ animal.tag_id if animal else '' }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Animal Name (Optional)</label>
+              <input type="text" name="name" class="form-control" placeholder="e.g. Lakshmi, Ganga, Gauri" value="{{ animal.name if animal else '' }}">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Species <span class="text-danger">*</span></label>
+              <select name="species" class="form-select" required>
+                <option value="Cow" {% if animal and animal.species == 'Cow' %}selected{% endif %}>Cow (ఆవు / गाय)</option>
+                <option value="Buffalo" {% if animal and animal.species == 'Buffalo' %}selected{% endif %}>Buffalo (గేదె / भैंस)</option>
+                <option value="Goat" {% if animal and animal.species == 'Goat' %}selected{% endif %}>Goat (మేక / बकरी)</option>
+                <option value="Sheep" {% if animal and animal.species == 'Sheep' %}selected{% endif %}>Sheep (గొర్రె / भेड़)</option>
+                <option value="Poultry" {% if animal and animal.species == 'Poultry' %}selected{% endif %}>Poultry / Chicken (కోడి / मुर्गी)</option>
+                <option value="Bullock" {% if animal and animal.species == 'Bullock' %}selected{% endif %}>Bullock / Work Cattle</option>
+                <option value="Other" {% if animal and animal.species == 'Other' %}selected{% endif %}>Other Livestock</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Breed</label>
+              <input type="text" name="breed" class="form-control" placeholder="e.g. Gir, Murrah, Sahiwal, Osmanabadi" value="{{ animal.breed if animal else '' }}">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Age (Months)</label>
+              <input type="number" name="age_months" class="form-control" placeholder="e.g. 36" value="{{ animal.age_months if animal else '24' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Gender</label>
+              <select name="gender" class="form-select">
+                <option value="Female" {% if animal and animal.gender == 'Female' %}selected{% endif %}>Female</option>
+                <option value="Male" {% if animal and animal.gender == 'Male' %}selected{% endif %}>Male</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Current Health Status</label>
+              <select name="health_status" class="form-select">
+                <option value="Healthy" {% if animal and animal.health_status == 'Healthy' %}selected{% endif %}>Healthy</option>
+                <option value="Under Observation" {% if animal and animal.health_status == 'Under Observation' %}selected{% endif %}>Under Observation</option>
+                <option value="Sick" {% if animal and animal.health_status == 'Sick' %}selected{% endif %}>Sick / Under Treatment</option>
+                <option value="Recovered" {% if animal and animal.health_status == 'Recovered' %}selected{% endif %}>Recovered</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Reproductive / Production Status</label>
+            <select name="reproductive_status" class="form-select">
+              <option value="Lactating" {% if animal and animal.reproductive_status == 'Lactating' %}selected{% endif %}>Lactating (Milking)</option>
+              <option value="Pregnant" {% if animal and animal.reproductive_status == 'Pregnant' %}selected{% endif %}>Pregnant</option>
+              <option value="Dry" {% if animal and animal.reproductive_status == 'Dry' %}selected{% endif %}>Dry (Non-milking)</option>
+              <option value="Calf / Heifer" {% if animal and animal.reproductive_status == 'Calf / Heifer' %}selected{% endif %}>Calf / Heifer / Young</option>
+              <option value="Breeding Male" {% if animal and animal.reproductive_status == 'Breeding Male' %}selected{% endif %}>Breeding Male / Bull</option>
+              <option value="Not Applicable" {% if animal and animal.reproductive_status == 'Not Applicable' %}selected{% endif %}>Not Applicable</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Additional Health Notes (Vaccinations, deworming dates):</label>
+            <textarea name="notes" class="form-control" rows="2" placeholder="e.g. Vaccinated for FMD in July 2026, dewormed last month">{{ animal.notes if animal else '' }}</textarea>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('livestock.index') }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-farmer-primary fw-bold px-4">{{ action }} Animal Profile</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('animal_title') }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="card border-0 shadow-sm bg-white" style="border-radius: var(--radius-lg);">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <div class="d-flex align-items-center gap-3">
+          <div class="card-icon-box card-icon-red mb-0">
+            <i class="fa-solid fa-cow"></i>
+          </div>
+          <div>
+            <h3 class="fw-bold mb-1 text-dark">{{ t('animal_title') }}</h3>
+            <p class="text-muted small mb-0">{{ t('animal_subtitle') }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body p-4">
+        <!-- Live Real-Time Danger Notice triggered by main.js if user selects acute danger sign -->
+        <div id="liveDangerNotice" class="alert alert-danger shadow-sm mb-4" style="display: none; border-left: 6px solid #b71c1c;">
+          <div class="d-flex align-items-start gap-3">
+            <i class="fa-solid fa-triangle-exclamation fs-3 mt-1 text-danger"></i>
+            <div>
+              <h5 class="fw-bold mb-1 text-danger">EMERGENCY SYMPTOM DETECTED!</h5>
+              <p class="mb-2 small">
+                You selected a critical clinical warning sign (severe bloat, recumbency/downer, choking, or convulsions). Please do not wait — call a veterinarian or dial the national animal helpline immediately!
+              </p>
+              <a href="tel:1962" class="btn btn-sm btn-danger fw-bold"><i class="fa-solid fa-phone me-1"></i> Call 1962 Helpline Now</a>
+            </div>
+          </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('animal.triage') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+          <!-- Step 1: Species & Animal Info -->
+          <div class="mb-4">
+            <h5 class="fw-bold text-dark border-bottom pb-2">
+              <span class="badge bg-danger me-2">1</span> Animal Species & Profile
+            </h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">{{ t('select_species') }} <span class="text-danger">*</span></label>
+                <select name="species" class="form-select" required>
+                  <option value="Cow">Cow (ఆవు / गाय)</option>
+                  <option value="Buffalo">Buffalo (గేదె / भैंस)</option>
+                  <option value="Goat">Goat (మేక / बकरी)</option>
+                  <option value="Sheep">Sheep (గొర్రె / भेड़)</option>
+                  <option value="Poultry">Poultry / Chicken (కోడి / मुर्गी)</option>
+                  <option value="Bullock">Bullock / Working Cattle (ఎద్దు / बैल)</option>
+                  <option value="Other">Other Domestic Livestock</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">{{ t('animal_age') }} / Weight</label>
+                <input type="text" name="age_approx" class="form-control" placeholder="e.g. 4 years, ~350 kg, or 3 months calf">
+              </div>
+
+              {% if user_livestock %}
+              <div class="col-12">
+                <label class="form-label fw-semibold text-muted small">Link to Saved Livestock Profile (Optional):</label>
+                <select name="livestock_id" class="form-select form-select-sm">
+                  <option value="">-- Do not link to a saved animal profile --</option>
+                  {% for an in user_livestock %}
+                  <option value="{{ an.id }}">{{ an.tag_id }} - {{ an.name or an.species }} ({{ an.gender }}, {{ an.health_status }})</option>
+                  {% endfor %}
+                </select>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Step 2: Clinical Observations & Key Indicators -->
+          <div class="mb-4">
+            <h5 class="fw-bold text-dark border-bottom pb-2">
+              <span class="badge bg-danger me-2">2</span> Vital Clinical Observations
+            </h5>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">{{ t('appetite') }} <span class="text-danger">*</span></label>
+                <select name="appetite" class="form-select" required>
+                  <option value="normal">Normal (eating & chewing cud)</option>
+                  <option value="reduced">Reduced (eating less fodder)</option>
+                  <option value="stopped">Completely Stopped (Off-feed & water)</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">{{ t('behavior') }} <span class="text-danger">*</span></label>
+                <select name="behavior" class="form-select" required>
+                  <option value="alert">Alert, energetic & responsive</option>
+                  <option value="dull">Dull, sluggish & isolated</option>
+                  <option value="restless">Restless, kicking belly, groaning</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">{{ t('standing') }} <span class="text-danger">*</span></label>
+                <select name="standing_status" class="form-select" required>
+                  <option value="normal">Normal mobility & posture</option>
+                  <option value="limping">Limping / Stiff gait</option>
+                  <option value="unable">DOWNER: Unable to stand / recumbent</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">{{ t('breathing') }}</label>
+                <select name="breathing_status" class="form-select">
+                  <option value="normal">Normal quiet breathing</option>
+                  <option value="rapid">Rapid or continuous coughing</option>
+                  <option value="distress">DISTRESS: Gasping with tongue out / open mouth</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">{{ t('temperature') }}</label>
+                <select name="temperature_status" class="form-select">
+                  <option value="normal">Normal body temperature</option>
+                  <option value="high_fever">High Fever (burning hot horns/ears)</option>
+                  <option value="cold">Cold / Chilled body and extremities</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">{{ t('milk_yield') }}</label>
+                <select name="milk_yield_drop" class="form-select">
+                  <option value="none">Not applicable / Normal milk yield</option>
+                  <option value="moderate">Moderate drop in yield</option>
+                  <option value="severe">Severe, sudden collapse in milk</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Specific Symptoms Checklist with Danger Sign Detection -->
+            <label class="form-label fw-semibold">Check Specific Symptoms Observed:</label>
+            <div class="row g-2 mb-3">
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input triage-symptom-check" type="checkbox" name="symptoms" value="unable to stand downer" id="asym1">
+                  <label class="form-check-label text-danger fw-bold" for="asym1">Downer: Cannot stand up / lying flat</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input triage-symptom-check" type="checkbox" name="symptoms" value="severe bloat tympany distended stomach" id="asym2">
+                  <label class="form-check-label text-danger fw-bold" for="asym2">Severe Bloat (left stomach swollen tight)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input triage-symptom-check" type="checkbox" name="symptoms" value="foaming at mouth frothing profuse salivation" id="asym3">
+                  <label class="form-check-label text-danger fw-bold" for="asym3">Foaming at mouth / Profuse ropy drooling</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input triage-symptom-check" type="checkbox" name="symptoms" value="swollen painful udder blood in milk clots mastitis" id="asym4">
+                  <label class="form-check-label" for="asym4">Hard swollen udder / Blood or clots in milk</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input triage-symptom-check" type="checkbox" name="symptoms" value="severe bleeding from rectum or nose" id="asym5">
+                  <label class="form-check-label text-danger fw-bold" for="asym5">Bleeding from natural openings (nose/rectum)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input triage-symptom-check" type="checkbox" name="symptoms" value="convulsions seizures violent shivering" id="asym6">
+                  <label class="form-check-label text-danger fw-bold" for="asym6">Convulsions, tremors, or head pressing</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input triage-symptom-check" type="checkbox" name="symptoms" value="sudden death of multiple birds flock mortality" id="asym7">
+                  <label class="form-check-label text-danger fw-bold" for="asym7">Sudden death of multiple birds in poultry flock</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input triage-symptom-check" type="checkbox" name="symptoms" value="severe diarrhea foul smell dehydration" id="asym8">
+                  <label class="form-check-label" for="asym8">Persistent foul diarrhea / Sunken eyes</label>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="form-label fw-semibold">Other Notes / Duration of Sickness:</label>
+              <textarea name="symptoms_notes" class="form-control" rows="2" placeholder="e.g. Started yesterday evening after eating fresh green grass, calf has not nursed"></textarea>
+            </div>
+          </div>
+
+          <!-- Strict Legal & Clinical Safeguard Box -->
+          <div class="vet-safeguard-box">
+            <div class="d-flex align-items-start gap-2">
+              <i class="fa-solid fa-ban text-danger fs-5 mt-1"></i>
+              <div>
+                <strong>Strict Veterinary Guidance Notice:</strong>
+                {{ t('animal_disclaimer') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="d-grid">
+            <button type="submit" class="btn btn-farmer-danger btn-touch-lg fw-bold">
+              <i class="fa-solid fa-stethoscope me-2"></i> {{ t('triage_button') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

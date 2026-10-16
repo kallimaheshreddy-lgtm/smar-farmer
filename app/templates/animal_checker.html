@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h2 class="mb-3">Animal Health Checker</h2>
+        <p class="text-muted">This tool supports conservative veterinary triage and safe advice only. It does not diagnose or prescribe veterinary medicines.</p>
+        <form method="post">
+          {{ csrf_token() }}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Animal type</label>
+              <select class="form-select" name="animal_type" required>
+                <option value="">Select animal</option>
+                <option value="Cow">Cow</option>
+                <option value="Buffalo">Buffalo</option>
+                <option value="Goat">Goat</option>
+                <option value="Sheep">Sheep</option>
+                <option value="Chicken">Chicken</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Age (months)</label>
+              <input type="number" class="form-control" name="age_months" min="0">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Weight (kg)</label>
+              <input type="number" step="0.1" class="form-control" name="weight_kg">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Symptoms</label>
+              <textarea class="form-control" name="symptoms" rows="4" required placeholder="Example: difficulty breathing, swelling, off-feed, diarrhoea, weakness."></textarea>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Duration of illness (days)</label>
+              <input type="number" class="form-control" name="duration_days" min="0">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Eating behaviour</label>
+              <input type="text" class="form-control" name="eating_behavior" placeholder="Normal / reduced / none">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Drinking behaviour</label>
+              <input type="text" class="form-control" name="drinking_behavior" placeholder="Normal / reduced / none">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Milk change</label>
+              <input type="text" class="form-control" name="milk_change" placeholder="Normal / lower / stopped">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Pregnancy status</label>
+              <input type="text" class="form-control" name="pregnancy_status" placeholder="Pregnant / not pregnant / unknown">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Temperature (°C)</label>
+              <input type="number" step="0.1" class="form-control" name="temperature_c">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success mt-3">Assess animal</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h4>Triage outcome</h4>
+        {% if result %}
+          <div class="alert alert-{% if result.category == 'emergency' %}danger{% elif result.category == 'urgent' %}warning{% else %}info{% endif %}">
+            {% if result.category == 'emergency' %}Emergency{% elif result.category == 'urgent' %}Urgent{% else %}Routine{% endif %}
+          </div>
+          <p><strong>Explanation:</strong> {{ result.explanation }}</p>
+          <p><strong>Advice:</strong> {{ result.advice }}</p>
+          <ul>
+            <li>Do not use human medicines on animals without veterinary direction.</li>
+            <li>In severe cases, call a veterinarian immediately.</li>
+            <li>If there is collapse, severe bleeding, seizures or breathing difficulty, seek emergency help.</li>
+          </ul>
+        {% else %}
+          <p class="text-muted">Your triage result will appear here after submission.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

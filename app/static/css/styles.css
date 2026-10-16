@@ -1,0 +1,417 @@
+/* ==========================================================================
+   SMART FARMER AI — DESIGN SYSTEM & AGRICULTURAL STYLING
+   Primary Palette: Forest Green (#1b5e20), Emerald (#2e7d32), Light Earth (#f4f7f2)
+   Accents: Amber Harvest (#f57f17), Alert Red (#c62828), Calm Sky (#0277bd)
+   ========================================================================== */
+
+:root {
+  --primary-dark: #1b5e20;
+  --primary-green: #2e7d32;
+  --primary-light: #4caf50;
+  --primary-soft: #e8f5e9;
+  --accent-gold: #f57f17;
+  --accent-gold-soft: #fffde7;
+  --bg-main: #f8faf7;
+  --bg-card: #ffffff;
+  --text-main: #212529;
+  --text-muted: #556052;
+  --border-subtle: #dce7d9;
+  --danger-red: #c62828;
+  --warning-amber: #e65100;
+  --info-blue: #0277bd;
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --shadow-sm: 0 2px 6px rgba(27, 94, 32, 0.06);
+  --shadow-md: 0 8px 24px rgba(27, 94, 32, 0.10);
+  --shadow-hover: 0 14px 30px rgba(27, 94, 32, 0.16);
+  --transition: all 0.25s ease-in-out;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+/* ==========================================================================
+   TOP EMERGENCY HELPLINE BANNER
+   ========================================================================== */
+.top-emergency-bar {
+  background: linear-gradient(90deg, #1b5e20 0%, #2e7d32 100%);
+  color: #ffffff;
+  font-size: 0.88rem;
+  padding: 6px 0;
+  border-bottom: 2px solid #81c784;
+}
+
+.top-emergency-bar a {
+  color: #fffde7;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.top-emergency-bar a:hover {
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   NAVBAR & HEADER
+   ========================================================================== */
+.navbar-farmer {
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border-bottom: 2px solid var(--border-subtle);
+  padding: 0.75rem 1rem;
+}
+
+.navbar-farmer .navbar-brand {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary-dark) !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar-farmer .navbar-brand .brand-badge {
+  background-color: var(--primary-soft);
+  color: var(--primary-dark);
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-weight: 700;
+  border: 1px solid #c8e6c9;
+}
+
+.navbar-farmer .nav-link {
+  color: #333d31 !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.5rem 0.85rem !important;
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+}
+
+.navbar-farmer .nav-link:hover,
+.navbar-farmer .nav-link.active {
+  color: var(--primary-dark) !important;
+  background-color: var(--primary-soft);
+}
+
+.lang-selector-btn {
+  background-color: var(--primary-soft);
+  color: var(--primary-dark);
+  border: 1px solid #c8e6c9;
+  font-weight: 600;
+  font-size: 0.88rem;
+  border-radius: 20px;
+  padding: 4px 12px;
+}
+
+/* ==========================================================================
+   HERO SECTION
+   ========================================================================== */
+.hero-banner {
+  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 60%, #388e3c 100%);
+  color: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 3.5rem 2.5rem;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+}
+
+.hero-banner::after {
+  content: "🌾";
+  font-size: 14rem;
+  position: absolute;
+  right: -20px;
+  bottom: -40px;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.hero-title {
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  opacity: 0.95;
+  max-width: 720px;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   CARDS & CONTAINERS
+   ========================================================================== */
+.farmer-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  padding: 1.5rem;
+  height: 100%;
+}
+
+.farmer-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  border-color: #a5d6a7;
+}
+
+.card-icon-box {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.card-icon-green {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.card-icon-amber {
+  background-color: #fff8e1;
+  color: #f57f17;
+}
+
+.card-icon-blue {
+  background-color: #e1f5fe;
+  color: #0277bd;
+}
+
+.card-icon-red {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.stat-card {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-number {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+.btn-farmer-primary {
+  background-color: var(--primary-green);
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  padding: 0.65rem 1.5rem;
+  border: none;
+  transition: var(--transition);
+}
+
+.btn-farmer-primary:hover {
+  background-color: var(--primary-dark);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+}
+
+.btn-farmer-secondary {
+  background-color: #ffffff;
+  color: var(--primary-dark);
+  border: 2px solid var(--primary-green);
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  padding: 0.6rem 1.4rem;
+  transition: var(--transition);
+}
+
+.btn-farmer-secondary:hover {
+  background-color: var(--primary-soft);
+  color: var(--primary-dark);
+}
+
+.btn-farmer-danger {
+  background-color: var(--danger-red);
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  padding: 0.65rem 1.5rem;
+  border: none;
+  transition: var(--transition);
+}
+
+.btn-farmer-danger:hover {
+  background-color: #b71c1c;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(198, 40, 40, 0.3);
+}
+
+.btn-touch-lg {
+  padding: 0.85rem 1.8rem;
+  font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   TRIAGE & STATUS BADGES
+   ========================================================================== */
+.badge-emergency {
+  background-color: #ffebee;
+  color: #b71c1c;
+  border: 1px solid #ffcdd2;
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+.badge-urgent {
+  background-color: #fff8e1;
+  color: #e65100;
+  border: 1px solid #ffe082;
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+.badge-monitor {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+  border: 1px solid #c8e6c9;
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ==========================================================================
+   DISCLAIMERS & NOTICES
+   ========================================================================== */
+.disclaimer-box {
+  background-color: #fffde7;
+  border-left: 5px solid #fbc02d;
+  padding: 1.1rem 1.4rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #424242;
+  margin-top: 1.5rem;
+  line-height: 1.5;
+}
+
+.vet-safeguard-box {
+  background-color: #ffebee;
+  border-left: 5px solid var(--danger-red);
+  padding: 1.25rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.92rem;
+  color: #212121;
+  margin-bottom: 1.5rem;
+  line-height: 1.55;
+}
+
+/* ==========================================================================
+   IMAGE UPLOAD PREVIEW
+   ========================================================================== */
+.upload-dropzone {
+  border: 2px dashed #81c784;
+  border-radius: var(--radius-lg);
+  background-color: #f1f8e9;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.upload-dropzone:hover {
+  background-color: #e8f5e9;
+  border-color: #2e7d32;
+}
+
+.preview-container img {
+  max-height: 320px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  border: 3px solid #ffffff;
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.footer-farmer {
+  background-color: #133a16;
+  color: #cfd8dc;
+  padding: 3rem 0 1.5rem 0;
+  margin-top: 4rem;
+  border-top: 4px solid #2e7d32;
+}
+
+.footer-farmer h5 {
+  color: #ffffff;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+}
+
+.footer-farmer a {
+  color: #b0bec5;
+  text-decoration: none;
+  transition: var(--transition);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.footer-farmer a:hover {
+  color: #81c784;
+  padding-left: 4px;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 1.85rem;
+  }
+  .hero-banner {
+    padding: 2rem 1.2rem;
+  }
+  .stat-number {
+    font-size: 1.7rem;
+  }
+}

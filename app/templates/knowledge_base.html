@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card shadow-sm border-0">
+  <div class="card-body p-4">
+    <h2>Verified treatment knowledge base</h2>
+    <p class="text-muted">Example records are labeled and should be re-verified by agriculture or veterinary experts before use in the field.</p>
+    {% if entries %}
+      <div class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Target</th>
+              <th>Subject</th>
+              <th>Recommendation</th>
+              <th>Source</th>
+              <th>Verified</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in entries %}
+              <tr>
+                <td>{{ entry.category }}</td>
+                <td>{{ entry.target_name }}</td>
+                <td>{{ entry.subject }}</td>
+                <td>{{ entry.recommendation }}</td>
+                <td>{{ entry.evidence_source }}</td>
+                <td>{{ entry.verification_date }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted">No entries available.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

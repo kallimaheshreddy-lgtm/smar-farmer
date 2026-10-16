@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h2>Weather Information</h2>
+        {% if configured %}
+          <div class="alert alert-success">Live weather API is configured.</div>
+          <div class="row g-3">
+            <div class="col-md-4"><div class="card bg-light h-100"><div class="card-body"><h6>Temperature</h6><h3>{{ sample.temperature_c if sample else '28°C' }}</h3></div></div></div>
+            <div class="col-md-4"><div class="card bg-light h-100"><div class="card-body"><h6>Humidity</h6><h3>{{ sample.humidity if sample else '62%' }}</h3></div></div></div>
+            <div class="col-md-4"><div class="card bg-light h-100"><div class="card-body"><h6>Rainfall</h6><h3>{{ sample.rainfall_forecast_mm if sample else '12 mm' }}</h3></div></div></div>
+          </div>
+          <p class="mt-3 mb-0 text-muted">This interface is ready to connect to a legitimate weather provider. A real API key is required to fetch live weather.</p>
+        {% else %}
+          <div class="alert alert-warning">
+            {{ sample.alert if sample else 'Weather API key is missing. Configure WEATHER_API_KEY to enable live weather data.' }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

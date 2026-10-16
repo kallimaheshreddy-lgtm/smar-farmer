@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('app_name') }} — {{ t('app_tagline') }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-banner">
+  <div class="row align-items-center">
+    <div class="col-lg-8">
+      <span class="badge bg-light text-success fw-bold px-3 py-2 mb-3">
+        <i class="fa-solid fa-wheat-awn me-1"></i> Tailored for Indian Farming Communities
+      </span>
+      <h1 class="hero-title">{{ t('app_tagline') }}</h1>
+      <p class="hero-subtitle">
+        Empowering farmers to accurately identify crop diseases, recognize early livestock warning signs, apply verified integrated pest management, and reach qualified veterinarians without delay.
+      </p>
+      <div class="d-flex flex-wrap gap-3">
+        <a href="{{ url_for('plant.checker') }}" class="btn btn-warning btn-touch-lg fw-bold text-dark shadow">
+          <i class="fa-solid fa-camera me-2"></i> {{ t('check_plant') }}
+        </a>
+        <a href="{{ url_for('animal.triage') }}" class="btn btn-light btn-touch-lg fw-bold text-success shadow">
+          <i class="fa-solid fa-shield-heart me-2 text-danger"></i> {{ t('check_animal') }}
+        </a>
+        {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light btn-touch-lg fw-bold">
+          <i class="fa-solid fa-user-plus me-1"></i> Create Free Farmer Account
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Weather Snapshot Widget if available -->
+{% if weather %}
+<div class="card border-0 shadow-sm mb-4 bg-white" style="border-radius: var(--radius-lg); border-left: 5px solid #0288d1 !important;">
+  <div class="card-body p-3 p-md-4">
+    <div class="row align-items-center">
+      <div class="col-md-7">
+        <h5 class="mb-1 text-dark fw-bold">
+          <i class="fa-solid fa-location-dot text-danger me-2"></i> {{ weather.location_name }}
+          <span class="badge bg-info-subtle text-info fw-semibold ms-2">{{ weather.zone }}</span>
+        </h5>
+        {% if weather.configured %}
+        <p class="mb-0 text-muted small">
+          <strong>Temperature:</strong> {{ weather.temperature }}°C | <strong>Humidity:</strong> {{ weather.humidity }}% | <strong>Conditions:</strong> {{ weather.description }}
+        </p>
+        {% else %}
+        <p class="mb-0 text-muted small">
+          {{ weather.notice }}
+        </p>
+        {% endif %}
+      </div>
+      <div class="col-md-5 text-md-end mt-2 mt-md-0">
+        <a href="{{ url_for('weather.index') }}" class="btn btn-sm btn-outline-primary fw-bold">
+          <i class="fa-solid fa-cloud-sun-rain me-1"></i> View Full Agro-Weather Forecast & Advisories
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Core Application Pillars -->
+<div class="row g-4 mb-5">
+  <!-- Plant Health Card -->
+  <div class="col-md-6 col-lg-4">
+    <div class="farmer-card">
+      <div class="card-icon-box card-icon-green">
+        <i class="fa-solid fa-plant-wilt"></i>
+      </div>
+      <h4 class="fw-bold mb-2">{{ t('plant_checker') }}</h4>
+      <p class="text-muted small mb-3">
+        Take a clear photo of the infected leaf or stem, or choose visible symptoms. Receive immediate preliminary screening with ICAR-verified biological controls.
+      </p>
+      <ul class="list-unstyled small text-muted mb-4">
+        <li><i class="fa-solid fa-check-circle text-success me-2"></i> Paddy, Cotton, Tomato, Wheat, Chilli, etc.</li>
+        <li><i class="fa-solid fa-check-circle text-success me-2"></i> Cultural & Biocontrol recommendations</li>
+        <li><i class="fa-solid fa-check-circle text-success me-2"></i> Strict chemical safety warnings</li>
+      </ul>
+      <a href="{{ url_for('plant.checker') }}" class="btn btn-farmer-primary w-100 fw-bold">
+        {{ t('check_plant') }} <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Animal Health Triage Card -->
+  <div class="col-md-6 col-lg-4">
+    <div class="farmer-card">
+      <div class="card-icon-box card-icon-red">
+        <i class="fa-solid fa-cow"></i>
+      </div>
+      <h4 class="fw-bold mb-2">{{ t('animal_checker') }}</h4>
+      <p class="text-muted small mb-3">
+        Conservative veterinary triage for cows, buffaloes, goats, sheep, and poultry. Prioritizes red-flag danger signs and safe nursing care.
+      </p>
+      <ul class="list-unstyled small text-muted mb-4">
+        <li><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i> Early warning for bloat, downers, mastitis</li>
+        <li><i class="fa-solid fa-ban text-secondary me-2"></i> Zero unauthorized antibiotic prescribing</li>
+        <li><i class="fa-solid fa-phone-volume text-success me-2"></i> Direct link to 1962 & nearby veterinarians</li>
+      </ul>
+      <a href="{{ url_for('animal.triage') }}" class="btn btn-farmer-danger w-100 fw-bold">
+        {{ t('check_animal') }} <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Fertilizer & Nutrition Guide -->
+  <div class="col-md-6 col-lg-4">
+    <div class="farmer-card">
+      <div class="card-icon-box card-icon-amber">
+        <i class="fa-solid fa-flask-vial"></i>
+      </div>
+      <h4 class="fw-bold mb-2">{{ t('fertilizer_guide') }}</h4>
+      <p class="text-muted small mb-3">
+        Scientific macronutrient (NPK) and micronutrient schedules. Optimize basal doses, top dressings, and organic vermicompost combinations.
+      </p>
+      <ul class="list-unstyled small text-muted mb-4">
+        <li><i class="fa-solid fa-check-circle text-warning me-2"></i> State university NPK split schedules</li>
+        <li><i class="fa-solid fa-check-circle text-warning me-2"></i> Bio-fertilizer (PSB, Azospirillum) integration</li>
+        <li><i class="fa-solid fa-check-circle text-warning me-2"></i> Soil moisture & application timing tips</li>
+      </ul>
+      <a href="{{ url_for('knowledge.fertilizer_guide') }}" class="btn btn-farmer-secondary w-100 fw-bold">
+        {{ t('fertilizer_guide') }} <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Crop Treatment Guide -->
+  <div class="col-md-6 col-lg-4">
+    <div class="farmer-card">
+      <div class="card-icon-box card-icon-green">
+        <i class="fa-solid fa-kit-medical"></i>
+      </div>
+      <h4 class="fw-bold mb-2">{{ t('crop_guide') }}</h4>
+      <p class="text-muted small mb-3">
+        Comprehensive repository of verified plant protection methods, pest traps, neem formulations, and disease containment keys.
+      </p>
+      <a href="{{ url_for('knowledge.crop_treatments') }}" class="btn btn-outline-success w-100 fw-bold">
+        Browse Treatments <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Agro-Climatic Weather -->
+  <div class="col-md-6 col-lg-4">
+    <div class="farmer-card">
+      <div class="card-icon-box card-icon-blue">
+        <i class="fa-solid fa-cloud-sun"></i>
+      </div>
+      <h4 class="fw-bold mb-2">{{ t('weather') }}</h4>
+      <p class="text-muted small mb-3">
+        Hyper-local weather guidance and practical spray advisories. Know exactly when high wind or rain would make foliar sprays wasteful.
+      </p>
+      <a href="{{ url_for('weather.index') }}" class="btn btn-outline-primary w-100 fw-bold">
+        Open Weather Desk <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Veterinary Directory -->
+  <div class="col-md-6 col-lg-4">
+    <div class="farmer-card">
+      <div class="card-icon-box card-icon-red">
+        <i class="fa-solid fa-hospital-user"></i>
+      </div>
+      <h4 class="fw-bold mb-2">{{ t('vet_contacts') }}</h4>
+      <p class="text-muted small mb-3">
+        Directory of Government Veterinary Hospitals, Polyclinics, Mobile Ambulatory Clinics, and KVKs with one-touch phone dials.
+      </p>
+      <a href="{{ url_for('vets.index') }}" class="btn btn-outline-danger w-100 fw-bold">
+        Find Help Nearby <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Three-Step Responsible Workflow -->
+<div class="bg-white p-4 p-md-5 rounded-4 shadow-sm mb-5 border">
+  <div class="text-center mb-4">
+    <h3 class="fw-bold text-dark">How Smart Farmer AI Works for You</h3>
+    <p class="text-muted">Simple, accessible, and grounded in proven agricultural science</p>
+  </div>
+  <div class="row g-4 text-center">
+    <div class="col-md-4">
+      <div class="p-3">
+        <div class="mx-auto mb-3 text-white bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; font-size: 1.6rem; font-weight: bold;">
+          1
+        </div>
+        <h5 class="fw-bold">Observe & Capture</h5>
+        <p class="text-muted small">
+          Take a photo of the affected plant or select the visible symptoms and behaviors of your livestock.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="p-3">
+        <div class="mx-auto mb-3 text-white bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; font-size: 1.6rem; font-weight: bold;">
+          2
+        </div>
+        <h5 class="fw-bold">Verified Assessment</h5>
+        <p class="text-muted small">
+          Receive clear preliminary screening backed by ICAR & University diagnostic keys, biological controls, and safe interim nursing care.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="p-3">
+        <div class="mx-auto mb-3 text-white bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; font-size: 1.6rem; font-weight: bold;">
+          3
+        </div>
+        <h5 class="fw-bold">Consult Verified Experts</h5>
+        <p class="text-muted small">
+          When clinical danger signs arise, get directed immediately to registered veterinarians or nearby Krishi Vigyan Kendra extension officers.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ethical Safeguards & Legal Disclaimers Banner -->
+<div class="vet-safeguard-box">
+  <div class="d-flex align-items-start gap-3">
+    <i class="fa-solid fa-shield-halved text-danger fs-3 mt-1"></i>
+    <div>
+      <h5 class="fw-bold text-danger mb-1">Our Commitment to Agricultural Safety & Veterinary Ethics</h5>
+      <p class="mb-1 small">
+        <strong>Plant Health:</strong> Automated image and symptom screening provides preliminary guidance based on verified agricultural literature. It does not replace field visits by agronomists. We do not prescribe unauthorized chemical cocktails.
+      </p>
+      <p class="mb-0 small">
+        <strong>Animal Health:</strong> Smart Farmer AI does NOT prescribe antibiotics, prescription injections, or schedule drugs. Only licensed veterinarians may diagnose and prescribe medicine for livestock. If an animal shows acute emergency signs, immediately dial <strong>1962</strong> or visit your local veterinary dispensary.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

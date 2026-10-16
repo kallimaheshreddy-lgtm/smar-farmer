@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h2 class="mb-3">Crop Health Checker</h2>
+        <p class="text-muted">Upload plant images and describe symptoms. A real AI model is only used when configured; otherwise, this app provides a safe manual workflow.</p>
+
+        <form method="post" enctype="multipart/form-data">
+          {{ csrf_token() }}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Crop type</label>
+              <select class="form-select" name="crop_type" required>
+                <option value="">Select crop</option>
+                <option value="Rice">Rice</option>
+                <option value="Wheat">Wheat</option>
+                <option value="Tomato">Tomato</option>
+                <option value="Chilli">Chilli</option>
+                <option value="Cotton">Cotton</option>
+                <option value="Groundnut">Groundnut</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Crop variety (if known)</label>
+              <input type="text" class="form-control" name="crop_variety">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Growth stage</label>
+              <select class="form-select" name="growth_stage">
+                <option value="">Select stage</option>
+                <option value="Seedling">Seedling</option>
+                <option value="Vegetative">Vegetative</option>
+                <option value="Flowering">Flowering</option>
+                <option value="Fruit setting">Fruit setting</option>
+                <option value="Maturity">Maturity</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Affected area</label>
+              <input type="text" class="form-control" name="affected_area" placeholder="Example: North field, 2 acres">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Upload plant images</label>
+              <input type="file" class="form-control" name="images" multiple accept="image/png,image/jpeg,image/webp">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Describe visible symptoms</label>
+              <textarea class="form-control" name="symptoms" rows="5" required placeholder="Describe leaf spots, wilting, yellowing, holes, mould, stunting, or other symptoms."></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success mt-3">Assess crop</button>
+        </form>
+
+        {% if form_errors %}
+          <div class="alert alert-warning mt-3">
+            {% for error in form_errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h4>Assessment result</h4>
+        {% if result %}
+          <div class="alert alert-info">Model status: {{ result.model_status|upper }}</div>
+          <p><strong>Summary:</strong> {{ result.diagnosis }}</p>
+          <p><strong>Recommended next steps:</strong> {{ result.recommendation }}</p>
+          {% if result.ai_predictions %}
+            <h6>Possible conditions</h6>
+            <ul>
+              {% for item in result.ai_predictions %}
+                <li>{{ item.label }} (confidence: {{ (item.confidence * 100)|round(1) }}%)</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="alert alert-warning mt-3">
+              No real AI model is configured. This is not a confirmed diagnosis. Please inspect the crop carefully and contact an agricultural extension officer if you are unsure.
+            </div>
+          {% endif %}
+        {% else %}
+          <p class="text-muted">Your assessment will appear here after you submit the form.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

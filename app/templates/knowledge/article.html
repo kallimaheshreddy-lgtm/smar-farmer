@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} — Knowledge Base{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="card border-0 shadow-sm bg-white mb-4" style="border-radius: var(--radius-lg);">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <a href="{{ url_for('knowledge.index') }}" class="btn btn-sm btn-outline-secondary mb-3">
+          <i class="fa-solid fa-arrow-left me-1"></i> Back to Knowledge Base
+        </a>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="badge bg-success-subtle text-success fs-6">{{ article.category | replace('_', ' ') | capitalize }}</span>
+          <span class="text-muted small"><i class="fa-solid fa-calendar me-1"></i> Reviewed: {{ article.last_reviewed_date }}</span>
+        </div>
+        <h2 class="fw-bold text-dark mb-1">{{ article.title }}</h2>
+        <p class="text-muted small">Target Crop / Animal: <strong>{{ article.crop_or_animal }}</strong></p>
+      </div>
+
+      <div class="card-body p-4 p-md-5">
+        {% if article.symptoms_description %}
+        <div class="mb-4">
+          <h5 class="fw-bold text-dark mb-2">Description & Symptoms</h5>
+          <div class="p-3 bg-light rounded-3 text-muted small" style="line-height: 1.7;">
+            {{ article.symptoms_description }}
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="mb-4">
+          <h5 class="fw-bold text-dark mb-2">Verified Scientific Management Practices</h5>
+          <div class="p-4 rounded-3 border bg-white" style="border-left: 5px solid #2e7d32 !important; white-space: pre-line; line-height: 1.8;">
+            {{ article.management_practices }}
+          </div>
+        </div>
+
+        {% if article.organic_options %}
+        <div class="mb-4">
+          <h5 class="fw-bold text-success mb-2"><i class="fa-solid fa-leaf me-1"></i> Organic & Biocontrol Alternatives</h5>
+          <div class="p-3 bg-light rounded-3 text-dark small" style="line-height: 1.7;">
+            {{ article.organic_options }}
+          </div>
+        </div>
+        {% endif %}
+
+        {% if article.safety_precautions %}
+        <div class="mb-4">
+          <h5 class="fw-bold text-danger mb-2"><i class="fa-solid fa-triangle-exclamation me-1"></i> Safety & Environmental Precautions</h5>
+          <div class="p-3 rounded-3" style="background-color: #fffde7; border-left: 5px solid #fbc02d; line-height: 1.7;">
+            <div class="small text-dark">{{ article.safety_precautions }}</div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Institutional Citation -->
+        <div class="p-3 rounded-3 bg-light border d-flex justify-content-between align-items-center">
+          <div>
+            <strong class="text-dark small d-block">Verified Extension Source:</strong>
+            <span class="text-muted small">{{ article.source_institution }}</span>
+          </div>
+          <button onclick="window.print();" class="btn btn-sm btn-outline-secondary">
+            <i class="fa-solid fa-print me-1"></i> Print Guide
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

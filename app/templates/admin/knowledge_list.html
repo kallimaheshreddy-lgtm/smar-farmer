@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Knowledge Base — Admin{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm bg-white" style="border-radius: var(--radius-lg);">
+  <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+    <div>
+      <h3 class="fw-bold text-dark mb-1"><i class="fa-solid fa-book-bookmark text-success me-2"></i> Knowledge Base Curation</h3>
+      <p class="text-muted small mb-0">Review verified university recommendations, update review dates, or deactivate outdated advice.</p>
+    </div>
+    <a href="{{ url_for('admin.knowledge_add') }}" class="btn btn-farmer-primary">
+      <i class="fa-solid fa-plus me-1"></i> Add Verified Article
+    </a>
+  </div>
+
+  <div class="card-body p-4">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Category</th>
+            <th>Title</th>
+            <th>Target</th>
+            <th>Source Institution</th>
+            <th>Last Reviewed</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for art in articles %}
+          <tr class="{% if not art.is_active %}opacity-50{% endif %}">
+            <td>
+              <span class="badge {% if art.category == 'crop_disease' %}bg-success-subtle text-success{% elif art.category == 'animal_health' %}bg-danger-subtle text-danger{% elif art.category == 'fertilizer' %}bg-warning-subtle text-warning{% else %}bg-info-subtle text-info{% endif %}">
+                {{ art.category }}
+              </span>
+            </td>
+            <td class="fw-bold text-dark">{{ art.title }}</td>
+            <td class="small">{{ art.crop_or_animal }}</td>
+            <td class="small text-muted">{{ art.source_institution }}</td>
+            <td class="small"><span class="badge bg-light text-dark border">{{ art.last_reviewed_date }}</span></td>
+            <td>
+              {% if art.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-secondary">Deactivated</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex gap-2">
+                <a href="{{ url_for('admin.knowledge_edit', article_id=art.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <form method="POST" action="{{ url_for('admin.knowledge_toggle', article_id=art.id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                  <button type="submit" class="btn btn-sm {% if art.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                    {{ 'Deactivate' if art.is_active else 'Activate' }}
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
