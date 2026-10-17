@@ -23,8 +23,13 @@ instance/
 
 # Uploaded Files
 uploads/
-app/static/uploads/plant_*
+app/static/uploads/*
 !app/static/uploads/.gitkeep
+
+# Local Exports & Folders
+mahi/
+database_data/
+database_report.txt
 
 # Logs and OS files
 *.log

@@ -123,20 +123,25 @@
               </ul>
             </div>
 
-            <!-- Authentication User Dropdown or Login Buttons -->
+            <!-- Authentication User Dropdown and Direct Sign Out Button -->
             {% if current_user.is_authenticated %}
-            <div class="dropdown">
-              <button class="btn btn-outline-success dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fa-solid fa-circle-user me-1"></i> {{ current_user.name }}
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                <li><a class="dropdown-item" href="{{ url_for('main.dashboard') }}"><i class="fa-solid fa-gauge me-2"></i> {{ t('dashboard') }}</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}"><i class="fa-solid fa-id-card me-2"></i> {{ t('profile') }}</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('plant.history') }}"><i class="fa-solid fa-clock-rotate-left me-2"></i> Plant Checks</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('animal.history') }}"><i class="fa-solid fa-notes-medical me-2"></i> Triage Logs</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="fa-solid fa-right-from-bracket me-2"></i> {{ t('logout') }}</a></li>
-              </ul>
+            <div class="d-flex align-items-center gap-2">
+              <div class="dropdown">
+                <button class="btn btn-outline-success dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fa-solid fa-circle-user me-1"></i> {{ current_user.name }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                  <li><a class="dropdown-item" href="{{ url_for('main.dashboard') }}"><i class="fa-solid fa-gauge me-2"></i> {{ t('dashboard') }}</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}"><i class="fa-solid fa-id-card me-2"></i> {{ t('profile') }}</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('plant.history') }}"><i class="fa-solid fa-clock-rotate-left me-2"></i> Plant Checks</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('animal.history') }}"><i class="fa-solid fa-notes-medical me-2"></i> Triage Logs</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item text-danger fw-bold" href="{{ url_for('auth.logout') }}"><i class="fa-solid fa-right-from-bracket me-2"></i> {{ t('logout') }}</a></li>
+                </ul>
+              </div>
+              <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger btn-sm fw-bold px-3 d-flex align-items-center shadow-sm" title="Sign Out">
+                <i class="fa-solid fa-right-from-bracket me-1"></i> Sign Out
+              </a>
             </div>
             {% else %}
             <a href="{{ url_for('auth.login') }}" class="btn btn-success fw-bold btn-sm shadow-sm px-3">
