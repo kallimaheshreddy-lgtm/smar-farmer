@@ -3,7 +3,7 @@ services:
     name: smart-farmer-ai
     env: python
     buildCommand: python -m pip install -r requirements.txt && python seed_data.py
-    startCommand: python -m gunicorn run:app
+    startCommand: python -m gunicorn --bind 0.0.0.0:$PORT run:app
     envVars:
       - key: FLASK_ENV
         value: production
